@@ -8,19 +8,25 @@ This project is meant to replace the [old PreCDC-Scoreboard project](https://git
 This scoreboard runs on Express (Node.js). Documentation for this project will be updated as the project develops.
 
 # Prerequisites
-This documentation is for linux-based machines using bash.
+The following commands are for a new Ubuntu Server 20 machine.
 
-- Node
+1. Install Node.js by running the following commands:
+
+```bash
+$ sudo apt-get update
+$ sudo apt-get install nodejs
+$ sudo apt-get install npm
+```
 
 # Setup
 1. Clone the repository by running the following commands:
 
 ```bash
-> git clone https://github.com/PSASchool/PreCDC-Scoreboard-Node
-> cd PreCDC-Scoreboard-Node
+$ git clone https://github.com/PSASchool/PreCDC-Scoreboard-Node
+$ cd PreCDC-Scoreboard-Node
 ```
 
 2. Install dependencies by running the following command:
 ```bash
-npm install
+$ npm install
 ```
