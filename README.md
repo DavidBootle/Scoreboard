@@ -88,7 +88,7 @@ DATABASE_URL=mongodb://www.google.com
 
 The application reads this value on startup and retains it while the app is running. Changing the file while the app is running will have no effect. If you do override the database url, you may encounter a fatal error when starting the app. If you see "Connected to database!" when the app is started, then your database url is correct and the app is connected.
 
-Please note that using a non-local database is **not recommended** for production. This feature is intended to be used when testing in production, where you do not want to install MongoDB on your computer.
+Please note that using a non-local database is **not recommended** for production. This feature is intended to be used when testing, in cases where you do not want to install MongoDB on your computer.
 
 # Start
 Start the web server by running the following command:
