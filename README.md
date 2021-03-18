@@ -10,10 +10,15 @@ This scoreboard runs on Express (Node.js). Documentation for this project will b
 # Prerequisites
 The following commands are for a new Ubuntu Server 20 machine.
 
-1. Install Node.js by running the following commands:
+1. Install git:
 
 ```bash
-$ sudo apt-get update
+$ sudo apt-get install git
+```
+
+2. Install Node.js:
+
+```bash
 $ sudo apt-get install nodejs
 $ sudo apt-get install npm
 ```
