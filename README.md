@@ -23,6 +23,27 @@ $ sudo apt-get install nodejs
 $ sudo apt-get install npm
 ```
 
+3. Install MongoDB
+This server uses MongoDB as it's database. Therefore, MongoDB must be installed and running on the server.
+
+Run the following commands to install MongoDB:
+```bash
+$ wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+$ echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+$ sudo apt-get update
+$ sudo apt-get install -y mongodb-org
+```
+
+Then start the MongoDB service using:
+```bash
+sudo systemctl start mongod
+```
+
+You can verify that the database is running using:
+```bash
+sudo systemctl status mongod
+```
+
 # Setup
 ## Cloning the Repository
 Run the following commands:
