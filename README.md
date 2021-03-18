@@ -42,9 +42,9 @@ $ npm install
 Because the server operates on HTTPS in order to use a secure connection, the site must have a certificate. To create a self-signed certificate, use the following commands:
 
 ```bash
-openssl req -x509 -newkey rsa:2048 -keyout keytmp.pem -out cert.pem -days 365
-openssl rsa -in keytmp.pem -out key.pem
-rm keytmp.pem
+$ openssl req -x509 -newkey rsa:2048 -keyout keytmp.pem -out cert.pem -days 365
+$ openssl rsa -in keytmp.pem -out key.pem
+$ rm keytmp.pem
 ```
 
 # Start
