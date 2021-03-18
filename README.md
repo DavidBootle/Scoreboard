@@ -40,5 +40,5 @@ $ npm install
 Start the web server by running the following command:
 
 ```bash
-$ npm start
+$ sudo npm start
 ```
