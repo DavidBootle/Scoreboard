@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+    script(src='/javascripts/all.min.js')
+    script(src='/javascripts/jquery.min.js')
+  body
+
+    //- Navbar
+    ul(class='nav nav-pills m-2')
+      li(class='nav-item')
+        a(class='nav-link' + (title == 'Scoreboard' ? ' active' : ''), href='/') Scoreboard
+      li(class='nav-item')
+        a(class='nav-link' + (title == 'Tools' ? ' active' : ''), href='/tools') Tools
+
+    //- Content
+    block content

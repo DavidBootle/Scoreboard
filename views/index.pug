@@ -1,4 +1,4 @@
-extends layout
+extends mainpage
 
 block content
 
@@ -20,7 +20,7 @@ block content
       tbody
         each team, index in teams 
           tr(class='score-row')
-            th(scope='row') index 
-            td team.name
-            td team.id 
-            td team.score
+            th(scope='row')= index 
+            td= team.name
+            td= team.id 
+            td= team.score

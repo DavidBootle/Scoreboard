@@ -1,0 +1,23 @@
+extends mainpage 
+
+block content
+
+    script(src='/javascripts/tools.js')
+
+    div(class='container mt-5')
+        table(class='table mt-4')
+            thead(class='thead-dark')
+                tr
+                    th(scope='col', class='col-2') #
+                    th(scope='col', class='col-4') Name
+                    th(scope='col', class='col-4') Team
+                    th(scope='col', class='col-3') Rubees
+                    th(scope='col', class='col-1'): a(href='/tools/newteam'): i(class="fas fa-plus")
+            tbody
+                each team, index in teams 
+                    tr(class='score-row')
+                        th(scope='row', class='col-2')= index 
+                        td(class='col-4')= team.name
+                        td(class='col-4')= team.id 
+                        td(class='col-4')= team.score
+                        td(class='col-1') X
