@@ -96,3 +96,22 @@ Start the web server by running the following command:
 ```bash
 $ sudo npm start
 ```
+
+# Usage
+Please note that **none of the features listed here are final**. The scoreboard is still in development, and some features, such as login, have not yet been implemented.
+
+## Scoreboard (`/`)
+The scoreboard or main page (`/`) displays all the teams, their identifier, and their scores.
+
+## Tools (`/tools`)
+The tools page (`/tools`) contains a list of all the teams, their identifiers, and their scores, as well as tools used to manage the teams.
+
+### New Team (`/tools/newteam`)
+This page contains a form that allows you to add a new team to the scoreboard. You can access this page by clicking the plus (`+`) button in the top right corner of the team list on the tools page.
+
+In order to successfully add a team, the information inputted must pass the following checks:
+- None of the input forms are empty
+- The starting score input is an integer
+- The team identifier entered is unique
+
+If any of these checks fail, you will see an alert at the top of the screen information you what failed. Any inputs that contain invalid information will be highlighted red. You may also recieve alerts if the process of adding the team to the database encounters an issue on the server-side. These messages are `Database error` and `Failed to insert team into database`. If you see either of these messages, please create an issue on this repository.
