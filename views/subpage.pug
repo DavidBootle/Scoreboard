@@ -1,0 +1,13 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+    script(src='/javascripts/all.min.js')
+    script(src='/javascripts/jquery.min.js')
+  body
+    div(class='container mt-5')
+        div(id='alert-box')
+        //- Content
+        block content
