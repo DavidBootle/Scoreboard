@@ -1,5 +1,11 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+
+  //- Title Area
+  div(class='container mt-5 text-center')
+    h1 PreCDC Scoreboard 2021
+    div(class='text-secondary')
+      p This server is under construction.
+      p: a(href='https://github.com/PSASchool/PreCDC-Scoreboard-Node') Github Repository
+      p: a(href='https://192.168.20.218:5000') Old Scoreboard
