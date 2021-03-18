@@ -14,10 +14,18 @@ block content
                     th(scope='col', class='col-3') Rubees
                     th(scope='col', class='col-1'): a(href='/tools/newteam'): i(class="fas fa-plus")
             tbody
-                each team, index in teams 
+                if teams.length != 0
+                    each team, index in teams 
+                        tr(class='score-row')
+                            th(scope='row', class='col-2')= index + 1
+                            td(class='col-4')= team.name
+                            td(class='col-4')= team.id 
+                            td(class='col-4')= team.score
+                            td(class='col-1') X
+                else
                     tr(class='score-row')
-                        th(scope='row', class='col-2')= index 
-                        td(class='col-4')= team.name
-                        td(class='col-4')= team.id 
-                        td(class='col-4')= team.score
-                        td(class='col-1') X
+                        th(scope='row', class='col-2')= '---'
+                        td(class='col-4')= '---'
+                        td(class='col-4')= '---'
+                        td(class='col-4')= '---'
+                        td(class='col-1')

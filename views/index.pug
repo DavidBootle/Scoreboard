@@ -14,12 +14,19 @@ block content
           th(scope='col') Team
           th(scope='col') Rubees
       tbody
-        each team, index in teams 
+        if teams.length != 0
+          each team, index in teams 
+            tr(class='score-row')
+              th(scope='row')= index + 1
+              td= team.name
+              td= team.id 
+              td= team.score
+        else 
           tr(class='score-row')
-            th(scope='row')= index 
-            td= team.name
-            td= team.id 
-            td= team.score
+            th(scope='row')= '---'
+            td= '---'
+            td= '---'
+            td= '---'
     
     div(class='text-secondary mt-4')
       p This server is under construction.
