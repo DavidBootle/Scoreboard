@@ -8,22 +8,27 @@ This project is meant to replace the [old PreCDC-Scoreboard project](https://git
 This scoreboard runs on Express (Node.js). Documentation for this project will be updated as the project develops.
 
 # Prerequisites
-The following commands are for a new Ubuntu Server 20 machine.
+The server requires the following services/packages:
+- git
+- node.js
+- mongodb
 
-1. Install git:
+Please complete all of the following sections to install the required services/packages. Keep in mind that these instructions are for an Ubuntu Server 20 build.
+
+## Install git
 
 ```bash
 $ sudo apt-get install git
 ```
 
-2. Install Node.js:
+## Install node.js
 
 ```bash
 $ sudo apt-get install nodejs
 $ sudo apt-get install npm
 ```
 
-3. Install MongoDB
+## Install MongoDB
 This server uses MongoDB as it's database. Therefore, MongoDB must be installed and running on the server.
 
 Run the following commands to install MongoDB:
