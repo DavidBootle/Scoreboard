@@ -35,3 +35,10 @@ $ cd PreCDC-Scoreboard-Node
 ```bash
 $ npm install
 ```
+
+# Start
+Start the web server by running the following command:
+
+```bash
+$ npm start
+```
