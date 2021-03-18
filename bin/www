@@ -24,6 +24,33 @@ const cert = fs.readFileSync('./cert.pem')
 var port = normalizePort(process.env.PORT || '443');
 app.set('port', port);
 
+
+/**
+ * Setup and check database
+ */
+
+var MongoClient = require('mongodb').MongoClient;
+
+var url = process.env.DATABASE_URL || "mongodb://localhost:27017/";
+app.set('databaseUrl', url);
+
+var client = new MongoClient(url);
+
+async function setupDatabase() {
+  try {
+    await client.connect();
+
+    // establish and verify connection
+    await client.db('scoreboard').command({ ping : 1 });
+    console.log('Connected to database!');
+  }
+  finally {
+    await client.close();
+  }
+}
+
+setupDatabase().catch(console.dir);
+
 /**
  * Create HTTPS server.
  */

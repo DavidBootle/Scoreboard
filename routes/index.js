@@ -2,19 +2,29 @@ var express = require('express');
 var router = express.Router();
 var MongoClient = require('mongodb').MongoClient;
 
-var url = process.env.DATABASE_URL || "mongodb://localhost:27017/scoreboard"
-
-MongoClient.connect(url, function(err, db) {
-  if (err) throw err;
-  console.log("Connected to database!");
-  db.close();
-});
-
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', {
-    title: 'Scoreboard'
-  });
+
+router.get('/', async function (req, res) {
+
+  var client = new MongoClient(req.app.get('databaseUrl'));
+
+  try {
+    await client.connect();
+
+    var dbo = client.db('scoreboard');
+    var teams = await dbo.collection('teams').find({}).toArray();
+
+    res.render('index', {
+      title: 'Scoreboard',
+      teams: teams
+    });
+  }
+  catch (e) {
+    console.dir(e);
+  }
+  finally {
+    client.close();
+  }
 });
 
 module.exports = router;
