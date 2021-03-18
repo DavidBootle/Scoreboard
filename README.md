@@ -24,14 +24,32 @@ $ sudo apt-get install npm
 ```
 
 # Setup
-1. Clone the repository by running the following commands:
+## Cloning the Repository
+Run the following commands:
 
 ```bash
 $ git clone https://github.com/PSASchool/PreCDC-Scoreboard-Node
 $ cd PreCDC-Scoreboard-Node
 ```
 
-2. Install dependencies by running the following command:
+## Install Packages
+Running the following command will automatically install all packages required for the project.
 ```bash
 $ npm install
+```
+
+## Generate Keys
+Because the server operates on HTTPS in order to use a secure connection, the site must have a certificate. To create a self-signed certificate, use the following commands:
+
+```bash
+$ openssl req -x509 -newkey rsa:2048 -keyout keytmp.pem -out cert.pem -days 365
+$ openssl rsa -in keytmp.pem -out key.pem
+$ rm keytmp.pem
+```
+
+# Start
+Start the web server by running the following command:
+
+```bash
+$ sudo npm start
 ```
