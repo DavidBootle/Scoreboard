@@ -5,10 +5,6 @@ block content
   //- Title Area
   div(class='container mt-5 text-center')
     h1 PreCDC Scoreboard 2021
-    div(class='text-secondary')
-      p This server is under construction.
-      p: a(href='https://github.com/PSASchool/PreCDC-Scoreboard-Node') Github Repository
-      p: a(href='https://192.168.20.218:5000') Old Scoreboard
     
     table(class='table mt-4')
       thead(class='thead-dark')
@@ -24,3 +20,8 @@ block content
             td= team.name
             td= team.id 
             td= team.score
+    
+    div(class='text-secondary mt-4')
+      p This server is under construction.
+      p: a(href='https://github.com/PSASchool/PreCDC-Scoreboard-Node') Github Repository
+      p: a(href='https://192.168.20.218:5000') Old Scoreboard
