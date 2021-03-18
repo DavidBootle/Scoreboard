@@ -9,3 +9,18 @@ block content
       p This server is under construction.
       p: a(href='https://github.com/PSASchool/PreCDC-Scoreboard-Node') Github Repository
       p: a(href='https://192.168.20.218:5000') Old Scoreboard
+    
+    table(class='table mt-4')
+      thead(class='thead-dark')
+        tr
+          th(scope='col') #
+          th(scope='col') Name
+          th(scope='col') Team
+          th(scope='col') Rubees
+      tbody
+        each team, index in teams 
+          tr(class='score-row')
+            th(scope='row') index 
+            td team.name
+            td team.id 
+            td team.score
