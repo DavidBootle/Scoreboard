@@ -17,7 +17,7 @@ block content
                 if teams.length != 0
                     each team, index in teams 
                         tr(class='score-row')
-                            th(scope='row', class='col-2')= index 
+                            th(scope='row', class='col-2')= index + 1
                             td(class='col-4')= team.name
                             td(class='col-4')= team.id 
                             td(class='col-4')= team.score
