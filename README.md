@@ -134,7 +134,7 @@ Please note that **none of the features listed here are final**. The scoreboard 
 The scoreboard or main page (`/`) displays all the teams, their identifier, and their scores.
 
 ## Teams (`/teams`)
-The teams page (`/tools`) contains a list of all the teams, their identifiers, and their scores, as well as tools used to manage the teams.
+The teams page (`/tools`) contains a list of all the teams, their identifiers, and their scores, as well as tools used to manage the teams. This page is protected, which means that you must be logged in to access it. Attempting to access this page without being logged in will redirect you to the login page.
 
 ### New Team (`/teams/newteam`)
 This page contains a form that allows you to add a new team to the scoreboard. You can access this page by clicking the plus (`+`) button in the top right corner of the team list on the teams page.
@@ -150,3 +150,22 @@ In addition, all of the inputs have regular expression validation. The regex exp
 - Score: `^\-?[0-9]+$`
 
 If any of these checks fail, the offending input will be highlighted red. You may also recieve alerts if the process of adding the team to the database encounters an issue on the server-side. These messages are `Database error` and `Failed to insert team into database`. If you see either of these messages, please create an issue on this repository, as they can only be caused by a bug in the server.
+
+This page is protected, which means you must be logged in to access it. Attempting to access this page without being logged in will redirect you to the login page.
+
+## Login (`/login`)
+This page allows you to login to the site. You can also be redirected to this site by other pages that are protected.
+
+The page can take one query argument, `to`, that defines where the user should be sent after login is completed. The value of this argument should be URI encoded. 
+
+## Logoff (`/logoff`)
+Navigating to this page will log the user out and redirect them to the home page. There is currently no specification for where the user should be sent once logged out, since the only unprotected page is the homepage.
+
+# User Authentication
+This section covers how the server deals with logged in users. From this point forward, logged in users will be refered to as authenticated users.
+
+When a user is authenticated, they have access to management tools for both the scoreboard and for other user accounts. Users that are not authenticated cannot see pages they can't access in menus. If they attempt to navigate to a protected page, they will be redirected to the login page.
+
+The server marks a user as authenticated by setting a cookie with an authentication token. This authentication token is generated every time a user logs in, and is stored to the user's cookies. The cookie lasts until the end of the session. The authentication token is then linked to the user in the database for the duration that the user is logged in. When accessing any page, the app will read the authentication token from the user's request and attempt to look up the user in the database. The user's information is then added to the request for destination processing. If an authentication token cannot be found, or if no user matches the given authentication token, the user is set to `null` in the request.
+
+When the user attempts to access a protected page, the app checks to see if the user object inserted into the request is `null`. If it is, it redirects the user to the login page, setting the `to` query parameter to the url they were originally trying to access, so that when they finish logging in, it redirects them to the page they were originally trying to visit. If the user is not `null`, then the app allows the user access to the page.
