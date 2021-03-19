@@ -32,6 +32,7 @@ router.get('/newteam', function (req, res) {
 })
 
 router.post('/newteam', async function (req, res) {
+
     var name = req.body.name;
     var id = req.body.id;
     var score = req.body.score;
