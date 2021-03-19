@@ -12,8 +12,14 @@ html
     ul(class='nav nav-pills m-2')
       li(class='nav-item')
         a(class='nav-link' + (title == 'Scoreboard' ? ' active' : ''), href='/') Scoreboard
-      li(class='nav-item')
-        a(class='nav-link' + (title == 'Teams' ? ' active' : ''), href='/teams') Teams
+      if user != null
+        li(class='nav-item')
+          a(class='nav-link' + (title == 'Teams' ? ' active' : ''), href='/teams') Teams
+      else
+        li(class='nav-item')
+          a(class='nav-link' + (title == 'Login' ? ' active' : ''), href=`/login?to=${encodeURIComponent('/')}`) Login
 
-    //- Content
-    block content
+    div(class='container mt-5')
+        div(id='alert-box')
+        //- Content
+        block content
