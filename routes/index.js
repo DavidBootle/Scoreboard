@@ -16,7 +16,8 @@ router.get('/', async function (req, res) {
 
     res.render('index', {
       title: 'Scoreboard',
-      teams: teams
+      teams: teams,
+      user: req.user
     });
   }
   catch (e) {

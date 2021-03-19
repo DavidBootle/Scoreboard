@@ -1,0 +1,71 @@
+extends mainpage 
+
+block content 
+
+    script(src='/javascripts/formutils.js')
+    script(src='/javascripts/bootstrap.min.js')
+
+    script.
+        async function login() {
+
+            $('#alert-box').empty()
+
+            var sendData = {
+                username: $('#username').val(),
+                password: $('#password').val(),
+                forwardURL: "#{forwardURL}"
+            };
+
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(sendData)
+            });
+            const data = await response.json()
+
+
+            // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
+            // ERROR CODE SET 002
+            // Location for server: /app.js
+            const errorCode = {
+                INVALID_USER: 'invalid_user',
+                INCORRECT_PASSWORD: 'incorrect_password',
+                DATABASE_ERROR: 'database_error'
+            }
+
+            if (!data.ok) {
+                switch (data.errorCode) {
+                    case errorCode.INVALID_USER:
+                        invalidate('#username')
+                        uninvalidate('#password')
+                        break;
+                    case errorCode.INCORRECT_PASSWORD:
+                        invalidate('#password')
+                        uninvalidate('#username')
+                        break;
+                    case errorCode.DATABASE_ERROR:
+                        uninvalidate('#username')
+                        uninvalidate('#password')
+                        showAlert(data.reason)
+                }
+            } else {
+                window.location.replace("#{forwardURL}")
+            }
+        }
+
+    div(id='alert-box')
+
+    div(id='page-content')
+        h1 Login
+        form
+            div(class='form-group mb-3')
+                label(for='username') Username
+                input(class='form-control', id='username', type='text', name='username')
+                div(class='invalid-feedback') Username not found
+            div(class='form-group mb-3')
+                label(for='password') Password
+                input(class='form-control', id='password', type='password', name='password')
+                div(class='invalid-feedback') Password is incorrect
+        button(onclick='login()', class='btn btn-primary') Login

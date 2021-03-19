@@ -9,7 +9,8 @@ var app = require('../app');
 var debug = require('debug')('precdc-scoreboard-node:server');
 var fs = require('fs')
 var https = require('https');
-var express = require('express')
+var express = require('express');
+var bcrypt = require('bcrypt');
 
 /**
  * Read certs
@@ -24,6 +25,17 @@ const cert = fs.readFileSync('./cert.pem')
 var port = normalizePort(process.env.PORT || '443');
 app.set('port', port);
 
+
+/**
+ * Check master user exists
+ */
+
+if (process.env.MASTER_USER == undefined || process.env.MASTER_PASSWORD == undefined) {
+  throw Error('Master user must be defined!')
+}
+
+const MASTER_USER = process.env.MASTER_USER;
+const MASTER_PASSWORD = process.env.MASTER_PASSWORD;
 
 /**
  * Setup and check database
@@ -43,6 +55,25 @@ async function setupDatabase() {
     // establish and verify connection
     await client.db('scoreboard').command({ ping : 1 });
     console.log('Connected to database!');
+
+    console.log('Creating master user...')
+    var hashedPassword = await bcrypt.hash(MASTER_PASSWORD, 10)
+
+    var masterUserObject = {
+      username: MASTER_USER,
+      password: hashedPassword,
+      accountType: 'master'
+    }
+
+    // check if a master user is in database
+    var users = client.db('scoreboard').collection('users')
+    var result = await users.updateOne({'accountType': 'master'}, { $set: masterUserObject}, {upsert: true})
+
+    if (result.modifiedCount == 0) {
+      throw Error('Could not update master user')
+    }
+    
+    console.log('Master user created.')
   }
   finally {
     await client.close();

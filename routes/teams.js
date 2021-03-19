@@ -2,7 +2,15 @@ var express = require('express')
 var router = express.Router()
 var MongoClient = require('mongodb').MongoClient;
 
-router.get('/', async function (req, res) {
+const requireAuth = (req, res, next) => {
+    if (req.user) {
+        next();
+    } else {
+        res.redirect(`/login?to=${encodeURIComponent(req.originalUrl)}`)
+    }
+};
+
+router.get('/', requireAuth, async function (req, res) {
 
     var client = new MongoClient(req.app.get('databaseUrl'));
 
@@ -14,7 +22,8 @@ router.get('/', async function (req, res) {
 
         res.render('teams', {
             title: 'Teams',
-            teams: teams
+            teams: teams,
+            user: req.user
         });
     }
     catch (e) {
@@ -25,13 +34,14 @@ router.get('/', async function (req, res) {
     }
 })
 
-router.get('/newteam', function (req, res) {
+router.get('/newteam', requireAuth, function (req, res) {
     res.render('newteam', {
-        title: 'New Team'
+        title: 'New Team',
+        user: req.user
     });
 })
 
-router.post('/newteam', async function (req, res) {
+router.post('/newteam', requireAuth, async function (req, res) {
 
     var name = req.body.name;
     var id = req.body.id;
