@@ -103,15 +103,20 @@ Please note that **none of the features listed here are final**. The scoreboard 
 ## Scoreboard (`/`)
 The scoreboard or main page (`/`) displays all the teams, their identifier, and their scores.
 
-## Tools (`/tools`)
-The tools page (`/tools`) contains a list of all the teams, their identifiers, and their scores, as well as tools used to manage the teams.
+## Teams (`/teams`)
+The teams page (`/tools`) contains a list of all the teams, their identifiers, and their scores, as well as tools used to manage the teams.
 
-### New Team (`/tools/newteam`)
-This page contains a form that allows you to add a new team to the scoreboard. You can access this page by clicking the plus (`+`) button in the top right corner of the team list on the tools page.
+### New Team (`/teams/newteam`)
+This page contains a form that allows you to add a new team to the scoreboard. You can access this page by clicking the plus (`+`) button in the top right corner of the team list on the teams page.
 
 In order to successfully add a team, the information inputted must pass the following checks:
 - None of the input forms are empty
 - The starting score input is an integer
 - The team identifier entered is unique
 
-If any of these checks fail, you will see an alert at the top of the screen information you what failed. Any inputs that contain invalid information will be highlighted red. You may also recieve alerts if the process of adding the team to the database encounters an issue on the server-side. These messages are `Database error` and `Failed to insert team into database`. If you see either of these messages, please create an issue on this repository.
+In addition, all of the inputs have regular expression validation. The regex expressions are as follows:
+- Name: `^[A-Za-z0-9 \-_]+$`
+- ID: `^[0-9]*$`
+- Score: `^\-?[0-9]+$`
+
+If any of these checks fail, the offending input will be highlighted red. You may also recieve alerts if the process of adding the team to the database encounters an issue on the server-side. These messages are `Database error` and `Failed to insert team into database`. If you see either of these messages, please create an issue on this repository, as they can only be caused by a bug in the server.

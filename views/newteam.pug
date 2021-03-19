@@ -3,7 +3,7 @@ extends subpage
 block content 
 
     script(src='/javascripts/formutils.js')
-    script(src='/javascripts/tools.js')
+    script(src='/javascripts/teams.js')
     script(src='/javascripts/bootstrap.min.js')
 
 
@@ -69,4 +69,4 @@ block content
                 input(class='form-control', id='score', type='text', name='score', placeholder='0', onkeyup='validateScore(this)')
                 div(class='invalid-feedback', id='scoreFeedback') 
         button(onclick='newTeam()', class='btn btn-primary') Create
-        a(class='btn btn-outline-secondary ms-1', href='/tools') Cancel
+        a(class='btn btn-outline-secondary ms-1', href='/teams') Cancel
