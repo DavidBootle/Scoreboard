@@ -1,4 +1,7 @@
-input.invalid {
-  border-color: red; }
+small.is-valid {
+  color: green; }
+
+small.is-invalid {
+  color: red; }
 
 /*# sourceMappingURL=style.css.map */

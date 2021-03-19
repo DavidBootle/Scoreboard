@@ -1,12 +1,3 @@
-function showAlert(text, type='danger') {
-    var alert = $(
-    `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-        ${text}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>`)
-    $('#alert-box').append(alert)
-}
-
 async function newTeam() {
 
     var name = $('#name').val()
@@ -15,23 +6,8 @@ async function newTeam() {
 
     // reset submission feedback
     $('#alert-box').empty()
-    $('#name').removeClass('invalid')
-    $('#id').removeClass('invalid')
-    $('#score').removeClass('invalid')
 
-    if (name == '') {
-        showAlert('Team must have a name.')
-        $('#name').addClass('invalid')
-    }
-    if (id == '') {
-        showAlert('Team must have an id.')
-        $('#id').addClass('invalid')
-    }
-    if (score == '') {
-        showAlert('Team must have a starting score.')
-        $('#score').addClass('invalid')
-    }
-    if (name == '' || id == '' || score == '') {
+    if (name == '' || id == '' || score == '' || !/[0-9]{3}/.test(id)) {
         return
     }
 
@@ -39,7 +15,7 @@ async function newTeam() {
         score = parseInt(score)
     } else {
         showAlert('Starting score must be an integer.')
-        $('#score').addClass('invalid')
+        invalidate('#score')
         return
     }
 
@@ -68,10 +44,11 @@ async function newTeam() {
     if (data.ok == true) {
         showAlert('New team successfully added. <a href="/tools" class="alert-link">Click here</a> to go back to Tools.', 'success');
     } else {
-        showAlert(data.reason);
-
         if (data.errorCode == errorCode.TEAM_EXISTS) {
-            $('#id').addClass('invalid')
+            invalidate('#id')
+            $('#idFeedback').text('Team already exists.')
+        } else {
+            showAlert(data.reason);
         }
     }
 }
