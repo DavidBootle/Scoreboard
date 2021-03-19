@@ -12,8 +12,8 @@ router.get('/', async function (req, res) {
         var dbo = client.db('scoreboard');
         var teams = await dbo.collection('teams').find({}).toArray();
 
-        res.render('tools', {
-            title: 'Tools',
+        res.render('teams', {
+            title: 'Teams',
             teams: teams
         });
     }
@@ -41,7 +41,7 @@ router.post('/newteam', async function (req, res) {
 
     // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
     // ERROR CODE SET 001
-    // Location for client: /javascripts/tools.js
+    // Location for client: /javascripts/teams.js
     const errorCode = {
         DATABASE_ERROR: 'database_error',
         TEAM_EXISTS: 'team_exists',

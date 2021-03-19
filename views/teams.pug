@@ -2,7 +2,7 @@ extends mainpage
 
 block content
 
-    script(src='/javascripts/tools.js')
+    script(src='/javascripts/teams.js')
 
     div(class='container mt-5')
         table(class='table mt-4')
@@ -12,7 +12,7 @@ block content
                     th(scope='col', class='col-4') Name
                     th(scope='col', class='col-4') Team
                     th(scope='col', class='col-3') Rubees
-                    th(scope='col', class='col-1'): a(href='/tools/newteam'): i(class="fas fa-plus")
+                    th(scope='col', class='col-1'): a(href='/teams/newteam'): i(class="fas fa-plus")
             tbody
                 if teams.length != 0
                     each team, index in teams 

@@ -19,7 +19,7 @@ async function newTeam() {
         return
     }
 
-    const response = await fetch('/tools/newteam', {
+    const response = await fetch('/teams/newteam', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -34,7 +34,7 @@ async function newTeam() {
 
     // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
     // ERROR CODE SET 001
-    // Location for server: /routes/tools.js
+    // Location for server: /routes/teams.js
     const errorCode = {
         DATABASE_ERROR: 'database_error',
         TEAM_EXISTS: 'team_exists',
@@ -42,7 +42,7 @@ async function newTeam() {
     }
 
     if (data.ok == true) {
-        showAlert('New team successfully added. <a href="/tools" class="alert-link">Click here</a> to go back to Tools.', 'success');
+        showAlert('New team successfully added. <a href="/teams" class="alert-link">Click here</a> to go back to Teams.', 'success');
     } else {
         if (data.errorCode == errorCode.TEAM_EXISTS) {
             invalidate('#id')
