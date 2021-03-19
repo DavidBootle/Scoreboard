@@ -73,6 +73,34 @@ $ openssl rsa -in keytmp.pem -out key.pem
 $ rm keytmp.pem
 ```
 
+## Master User
+The server uses a login system to allow certain people to access the tools used to manage the server, and block others from doing the same thing. This system doesn't allow for sign ups, because that would defeat the purpose of only certain people being able to have a login. Therefore, the server operates on the assumtion that there is at least one administrator who can login and use the server tools to create more accounts for people that need them.
+
+The issue is that when you first create the server, there aren't any users. Therefore, you enter a catch-22 where you need a user to create more users but in order to first user you need another user. The solution to this problem is the master user, and it is **required** for the server to operate. The server will not start without the master user being set up.
+
+To set up the master user, you need to create a .env file for your app. You can do that by running the following command in the repository root:
+
+```bash
+$ echo "" > .env
+```
+
+Then, add the following lines to the .env file, replacing `username` and `password` with the actual username and password for the master account:
+
+```
+MASTER_USER=username
+MASTER_PASSWORD=password
+```
+
+**Please ensure that the master password is secure!** This account has complete access to all the functions of the scoreboard, including deleting other accounts, so if an adversary cracks your master password, your server is in serious trouble. It's recommended that you use a random password generate to create the password. The recommended requirements for the master password are:
+
+- At least 20 characters
+- Contains uppercase letters
+- Contains lowercase letters
+- Contains numbers
+- Contains symbols
+
+Remember that you will likely only use this account temporarily until you create your own standard admin account.
+
 ## Database URL
 By default, the app uses the following value as its database url:
 
@@ -80,7 +108,7 @@ By default, the app uses the following value as its database url:
 mongodb://localhost:27017/scoreboard
 ```
 
-This url points to a mongodb service running on the current machine, and the default database "scoreboard". If you followed the steps in the Prerequisites section, then this default will work without needing to override it. However, if you are interested in using a cloud database service, it is necessary to overwrite the default database url. You can do this by providing the app with a .env file that contains the variable `DATABASE_URL`. For example, if my database is located at google.com (as an example), you would add the following .env file to the root folder of the repository:
+This url points to a mongodb service running on the current machine, and the default database "scoreboard". If you followed the steps in the Prerequisites section, then this default will work without needing to override it. However, if you are interested in using a cloud database service, it is necessary to overwrite the default database url. You can do this by adding the variable `DATABASE_URL` to your .env file. For example, if my database is located at google.com (as an example), you would add the following to your .env file:
 
 ```
 DATABASE_URL=mongodb://www.google.com
