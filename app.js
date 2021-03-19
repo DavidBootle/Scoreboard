@@ -36,11 +36,19 @@ app.use(sassMiddleware({
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(async function(req, res, next) {
   const authToken = req.cookies["AuthToken"]
+  if (authToken == undefined || authToken == null) {
+    req.user = null;
+    next();
+    return;
+  }
   var client = new MongoClient(app.get('databaseUrl'))
   try {
     await client.connect()
     var users = client.db('scoreboard').collection('users')
     var user = await users.findOne({'token': authToken})
+    if (user == undefined) {
+      user = null;
+    }
     req.user = user;
     next()
   }
