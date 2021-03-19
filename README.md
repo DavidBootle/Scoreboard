@@ -74,9 +74,11 @@ $ rm keytmp.pem
 ```
 
 ## Master User
-The server uses a login system to allow certain people to access the tools used to manage the server, and block others from doing the same thing. This system doesn't allow for sign ups, because that would defeat the purpose of only certain people being able to have a login. Therefore, the server operates on the assumtion that there is at least one administrator who can login and use the server tools to create more accounts for people that need them.
+The server uses a login system to allow certain people to access the tools used to manage the scoreboard, and block others from doing the same thing. This system doesn't allow for sign ups, because that would defeat the purpose of only certain people being able to have a login. Therefore, the server operates on the assumtion that there is at least one administrator who can login and use the server tools to create more accounts for people that need them.
 
-The issue is that when you first create the server, there aren't any users. Therefore, you enter a catch-22 where you need a user to create more users but in order to first user you need another user. The solution to this problem is the master user, and it is **required** for the server to operate. The server will not start without the master user being set up.
+The issue is that when you first create the server, there aren't any users. The solution to this problem is the master user. The master user is always available as a valid user so you can use the master username and password to login to the scoreboard even with no other accounts being set up. The master user will not up as a user in the users list unless you are signed in as the master user. In addition, the master user can perform actions such as deleting other user accounts, which is not possible with a normal administrator account. It is intended to be used for maintence or to setup the first account. It should not be used to login to the server on a regular basis.
+
+The master user is **required** for the server to operate. The server will not start without the master user being set up.
 
 To set up the master user, you need to create a .env file for your app. You can do that by running the following command in the repository root:
 
