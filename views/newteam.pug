@@ -19,6 +19,8 @@ block content
 
             // requirement 3: must match pattern
             if (!requirement(input, nameFeedbackId, "Team name can only contain upper and lowercase letters, numbers, spaces, hyphens, and underscores.", (value) => { return (/^[A-Za-z0-9 \-_]+$/.test(value)) })) { return false; }
+
+            return true
         }
 
         function validateID(input) {
@@ -29,6 +31,8 @@ block content
 
             // requirement 2: must match pattern
             if (!requirement(input, idFeedbackId, "Must be numeric.", (value) => { return (/^[0-9]*$/.test(value)) })) { return false; }
+
+            return true
         }
 
         function validateScore(input) {
@@ -42,6 +46,8 @@ block content
 
             // requirement 3: must be numeric
             if (!requirement(input, scoreFeedbackId, "Must be an integer.", (value) => { return (/^\-?[0-9]+$/.test(value)) })) { return false }
+
+            return true
         }
 
         function validateAndSubmit() {
@@ -68,7 +74,7 @@ block content
                 label(for='score') Intitial Score
                 input(class='form-control', id='score', type='text', name='score', placeholder='0', onkeyup='validateScore(this)')
                 div(class='invalid-feedback', id='scoreFeedback') 
-        button(onclick='newTeam()', class='btn btn-primary') Create
+        button(onclick='validateAndSubmit()', class='btn btn-primary') Create
         a(class='btn btn-outline-secondary ms-1', href='/teams') Cancel
     
     script(src="/socket.io/socket.io.js")

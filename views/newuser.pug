@@ -1,0 +1,72 @@
+extends subpage
+
+block content 
+
+    script(src='/javascripts/formutils.js')
+    script(src='/javascripts/users.js')
+    script(src='/javascripts/bootstrap.min.js')
+
+
+    script.
+        function validateUsername(input) {
+            const usernameFeedbackId = "#usernameFeedback";
+
+            // requirement 1: must have a value
+            if (!requirement(input, usernameFeedbackId, "Username is a required property", (value) => { return (value.length != 0) })) { return false; }
+
+            // requirement 2: must be longer than 1 characters
+            if (!requirement(input, usernameFeedbackId, "Must be longer than 1 character", (value) => { return (value.length > 1) })) { return false; }
+
+            return true
+        }
+
+        function validatePassword(password, passwordConfirmation) {
+            const passwordFeedbackId = '#passwordFeedback';
+            const passwordConfirmationFeedbackId = '#passwordConfirmationFeedback';
+
+            // requirement 1: must be longer than 8 characters
+            if (!requirement(password, passwordFeedbackId, "Must be longer than 8 characters", (value) => { return (value.length > 8) })) { return false }
+
+            // requirement 2: must match password confirmation
+            if (!requirement(password, passwordFeedbackId, "Passwords do not match", (value) => { return (value == $('#passwordConfirmation').val()) })) { return false }
+
+            // requirement 1: must match password
+            if (!requirement(passwordConfirmation, passwordConfirmationFeedbackId, "Passwords do not match", (value) => { return (value == $('#password').val()) })) { return false }
+
+            return true
+        }
+
+        function validateAndSubmit() {
+            if (validateUsername('#username') && validatePassword('#password', '#passwordConfirmation')) {
+                newUser()
+            } else {
+                console.log('Could not add user.')
+            }
+        }
+
+    //- Good Alert
+    div(id='alert-box')
+
+    div(id='page-content')
+        h1 New User
+        form(novalidate)
+            div(class='form-group mb-3')
+                label(for='username') Username
+                input(class='form-control', id='username', type='text', name='username', placeholder='Username', onkeyup='validateUsername(this)')
+                div(class='invalid-feedback', id='usernameFeedback')
+            div(class='form-group mb-3')
+                label(for='password') Password
+                input(class='form-control', id='password', type='password', name='password', onkeyup='validatePassword(this, "#passwordConfirmation")')
+                div(class='invalid-feedback', id='passwordFeedback')
+            div(class='form-group mb-3')
+                label(for='password-confirmation') Confirm Password
+                input(class='form-control', id='passwordConfirmation', type='password', name='passwordConfirmation', onkeyup='validatePassword("#password", this)')
+                div(class='invalid-feedback', id='passwordConfirmationFeedback') 
+        button(onclick='validateAndSubmit()', class='btn btn-primary') Create
+        a(class='btn btn-outline-secondary ms-1', href='/users') Cancel
+    
+    script(src="/socket.io/socket.io.js")
+    script(src="/javascripts/socketutils.js")
+    script.
+        var socket = io()
+        addLogoffListener(socket);
