@@ -153,6 +153,11 @@ If any of these checks fail, the offending input will be highlighted red. You ma
 
 This page is protected, which means you must be logged in to access it. Attempting to access this page without being logged in will redirect you to the login page.
 
+### Remove Team (`/teams/removeteam`) (POST)
+This post path removes a team from the scoreboard. It takes a JSON object that must include the `id` parameter. `id` is the id of the team to delete. This page must be accompanied by a valid auth token, or a 401 error will be returned. You can delete a team by clicking the red trash icon next to a team on the `teams` page. Clicking this button will open a confirmation window to confirm that the team should be deleted.
+
+Opening `/teams` with the query parameter `confirm` set to `false` will disable the confirmation messages. Example: `/teams?confirm=false`. Opening the page with the `confirm` query parameter set to anything else will enable confirmation messages.
+
 ## Login (`/login`)
 This page allows you to login to the site. You can also be redirected to this site by other pages that are protected.
 
