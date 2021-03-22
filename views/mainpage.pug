@@ -15,6 +15,8 @@ html
       if user != null
         li(class='nav-item')
           a(class='nav-link' + (title == 'Teams' ? ' active' : ''), href='/teams') Teams
+        li(class='nav-item')
+          a(class='nav-link' + (title == 'Users' ? ' active' : ''), href='/users') Users
       else
         li(class='nav-item')
           a(class='nav-link' + (title == 'Login' ? ' active' : ''), href=`/login?to=${encodeURIComponent('/')}`) Login
