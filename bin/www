@@ -47,9 +47,8 @@ var MongoClient = require('mongodb').MongoClient;
 var url = process.env.DATABASE_URL || "mongodb://localhost:27017/";
 app.set('databaseUrl', url);
 
-var client = new MongoClient(url);
-
 async function setupDatabase() {
+  var client = new MongoClient(app.get('databaseUrl'));
   try {
     await client.connect();
 
