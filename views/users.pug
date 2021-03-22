@@ -1,0 +1,48 @@
+extends mainpage 
+
+block content
+
+    script(src='/javascripts/formutils.js')
+
+    div(class='row')
+        div(class='col-6')
+            div(class='card'): div(class='card-body')
+                h3(class='card-title') User List
+                table(class='table')
+                    thead(class='thead-dark')
+                        tr
+                            th(scope='col', class='col-8') Username
+                            th(scope='col', class='col-4') Account Type
+                    tbody
+                        if user.accountType == 'master'
+                            each user, index in users 
+                                tr(class='user-row')
+                                    td(class='col-8')= user.username
+                                    td(class='col-4')= user.accountType
+                        else 
+                            //- The minus one in the if statement is to account for the master account
+                            each rowUser, index in users 
+                                if rowUser.accountType != 'master'
+                                    tr(class='user-row')
+                                        td= rowUser.username
+                                        td= rowUser.accountType
+                button(class='btn btn-primary') Add New User
+        div(class='col-6')
+            div(class='card'): div(class='card-body')
+                h3(class='card-title') Your Profile 
+                h4(class='card-subtitle mb-2 text-muted')= user.username
+                hr
+                button(class='btn btn-primary user-tool-button') Logout
+                button(class='btn btn-info user-tool-button', disabled=(user.accountType == 'master')) Reset Password
+                button(class='btn btn-danger user-tool-button', disabled=(user.accountType == 'master')) Delete My Account
+                if user.accountType == 'master'
+                    hr
+                    button(class='btn btn-primary user-tool-button', disabled=(user.accountType != 'master')) Logout A User
+                    button(class='btn btn-info user-tool-button', disabled=(user.accountType != 'master')) Reset A User's Password 
+                    button(class='btn btn-danger user-tool-button', disabled=(user.accountType != 'master')) Delete A User Account 
+    
+    script(src="/socket.io/socket.io.js")
+    script(src="/javascripts/socketutils.js")
+    script.
+        var socket = io()
+        addLogoffListener(socket);
