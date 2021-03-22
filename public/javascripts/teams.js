@@ -58,3 +58,41 @@ async function newTeam() {
         }
     }
 }
+
+async function removeTeam(id) {
+
+    console.log("ID: ", id);
+
+    const response = await fetch('/teams/removeteam', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'id': id
+        })
+    });
+
+    console.dir(resopnse);
+
+    if (response.status == 401) {
+        showAlert('Unauthorized. Please log in.');
+        return;
+    }
+
+    const data = await response.json()
+
+    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
+    // ERROR CODE SET 003
+    // Location for server: /routes/teams.js
+    const errorCode = {
+        DATABASE_ERROR: 'database_error',
+        FAILED_DELETE: 'failed_delete'
+    }
+
+    if (data.ok == true) {
+        showAlert('Removed team.', 'success');
+    } else {
+        showAlert(data.reason);
+    }
+}
