@@ -170,6 +170,9 @@ Navigating to this page will log the user out and redirect them to the home page
 
 In addition, navigating to this page while logged in will immediatly send the `login` event to all pages logged in as that user, reloading them and causing them to log out as well. Therefore, logging out of one page will log the user out of every page at once. This is a security measure meant to make sure that stray connections do not stay logged in.
 
+## Users (`/users`)
+This page is built for managing users. On the left side of the screen is a list of all the users accounts. If the user is logged in as the master user, then they will also see the master user listed. Otherwise, the master user does not show up on this list. On the right side of the screen is information about the user, as well as tool buttons that can be used to manage the user account. If the user is signed in as the master, they will also see tools for managing other user accounts.
+
 # Design
 This section covers the design of the app, including different design decisions, and how the app functions.
 
