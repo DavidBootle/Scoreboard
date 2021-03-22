@@ -94,6 +94,11 @@ router.post('/newteam', requireAuth, async function (req, res) {
                 errorCode: errorCode.FAILED_INSERT
             });
         } else {
+
+            // update clients
+            var io = req.app.get('io');
+            io.emit('scoreboard-update');
+
             res.json({
                 ok: true
             });
