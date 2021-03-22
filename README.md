@@ -165,7 +165,10 @@ Navigating to this page will log the user out and redirect them to the home page
 
 In addition, navigating to this page while logged in will immediatly send the `login` event to all pages logged in as that user, reloading them and causing them to log out as well. Therefore, logging out of one page will log the user out of every page at once. This is a security measure meant to make sure that stray connections do not stay logged in.
 
-# User Authentication
+# Design
+This section covers the design of the app, including different design decisions, and how the app functions.
+
+## User Authentication
 This section covers how the server deals with logged in users. From this point forward, logged in users will be refered to as authenticated users.
 
 When a user is authenticated, they have access to management tools for both the scoreboard and for other user accounts. Users that are not authenticated cannot see pages they can't access in menus. If they attempt to navigate to a protected page, they will be redirected to the login page.
@@ -174,9 +177,13 @@ The server marks a user as authenticated by setting a cookie with an authenticat
 
 When the user attempts to access a protected page, the app checks to see if the user object inserted into the request is `null`. If it is, it redirects the user to the login page, setting the `to` query parameter to the url they were originally trying to access, so that when they finish logging in, it redirects them to the page they were originally trying to visit. If the user is not `null`, then the app allows the user access to the page.
 
-# Sockets
+## Scoreboard Updates
+Certain pages in the app contain scoreboards that need to update when scoreboard information changes. Therefore, the server sends a `scoreboard-update` event to all connected clients when the scoreboard changes in a major way. This simply causes said clients to refresh in the background, updating the scoreboard information. `scoreboard-update` will not be used with information like score changes, as it's fairly simple for the client to update itself. (since it doesn't involve heavy changes to the DOM). In addition, the number of score changes would make refreshes more common than is recommended.
+
+## Sockets
 This application uses socket.io for communication between clients and the server. Bascially, the server can send events to web pages, and web pages can send events to the server. Clients can react to these events, for example, updating the user interface, or reloading the page.
 
 Current uses of sockets include:
 
 - Refreshing all pages that the user is logged into when the user is logged out, causing them to go to the login screen.
+- Refreshing all pages that contain a scoreboard when the scoreboard is updated in a major way.
