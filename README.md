@@ -161,6 +161,8 @@ The page can take one query argument, `to`, that defines where the user should b
 ## Logoff (`/logoff`)
 Navigating to this page will log the user out and redirect them to the home page. There is currently no specification for where the user should be sent once logged out, since the only unprotected page is the homepage.
 
+In addition, navigating to this page while logged in will immediatly send the `login` event to all pages logged in as that user, reloading them and causing them to log out as well. Therefore, logging out of one page will log the user out of every page at once. This is a security measure meant to make sure that stray connections do not stay logged in.
+
 # User Authentication
 This section covers how the server deals with logged in users. From this point forward, logged in users will be refered to as authenticated users.
 
@@ -169,3 +171,10 @@ When a user is authenticated, they have access to management tools for both the 
 The server marks a user as authenticated by setting a cookie with an authentication token. This authentication token is generated every time a user logs in, and is stored to the user's cookies. The cookie lasts until the end of the session. The authentication token is then linked to the user in the database for the duration that the user is logged in. When accessing any page, the app will read the authentication token from the user's request and attempt to look up the user in the database. The user's information is then added to the request for destination processing. If an authentication token cannot be found, or if no user matches the given authentication token, the user is set to `null` in the request.
 
 When the user attempts to access a protected page, the app checks to see if the user object inserted into the request is `null`. If it is, it redirects the user to the login page, setting the `to` query parameter to the url they were originally trying to access, so that when they finish logging in, it redirects them to the page they were originally trying to visit. If the user is not `null`, then the app allows the user access to the page.
+
+# Sockets
+This application uses socket.io for communication between clients and the server. Bascially, the server can send events to web pages, and web pages can send events to the server. Clients can react to these events, for example, updating the user interface, or reloading the page.
+
+Current uses of sockets include:
+
+- Refreshing all pages that the user is logged into when the user is logged out, causing them to go to the login screen.

@@ -6,6 +6,8 @@ var MongoClient = require('mongodb').MongoClient;
 
 router.get('/', async function (req, res) {
 
+  var io = req.app.get('io')
+
   var client = new MongoClient(req.app.get('databaseUrl'));
 
   try {

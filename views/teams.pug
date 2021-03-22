@@ -28,3 +28,9 @@ block content
                     td(class='col-4')= '---'
                     td(class='col-4')= '---'
                     td(class='col-1')
+    
+    script(src="/socket.io/socket.io.js")
+    script(src="/javascripts/socketutils.js")
+    script.
+        var socket = io()
+        addLogoffListener(socket);

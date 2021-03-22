@@ -70,3 +70,9 @@ block content
                 div(class='invalid-feedback', id='scoreFeedback') 
         button(onclick='newTeam()', class='btn btn-primary') Create
         a(class='btn btn-outline-secondary ms-1', href='/teams') Cancel
+    
+    script(src="/socket.io/socket.io.js")
+    script(src="/javascripts/socketutils.js")
+    script.
+        var socket = io()
+        addLogoffListener(socket);

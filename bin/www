@@ -11,6 +11,7 @@ var fs = require('fs')
 var https = require('https');
 var express = require('express');
 var bcrypt = require('bcrypt');
+var socketCookieParser = require('socket.io-cookie-parser');
 
 /**
  * Read certs
@@ -87,6 +88,93 @@ setupDatabase().catch(console.dir);
  */
 
 var server = https.createServer({key: key, cert: cert}, app);
+
+/**
+ * Create socket
+ */
+
+var io = require('socket.io')(server)
+//unregister sockets that aren't connected by going through the users and checking to see if those socket connections are still live
+var client = new MongoClient(app.get('databaseUrl'));
+client.connect().then( (client) => {
+  usersCollection = client.db('scoreboard').collection('users');
+  usersCollection.find({ 'sockets': { $exists : true } }).toArray( (err, results) => {
+    if (err) throw err;
+
+    var socketList = io.sockets.server.eio.clients;
+
+    results.forEach( async (user, index, array) => {
+      for (socketId of user.sockets) {
+        if (socketList[socketId] == undefined) {
+          var results = await usersCollection.updateOne({'username': user.username}, { $pull : {'sockets': socketId} });
+          if (results.modifiedCount != 0) {
+            console.log(`Removed unused socket ${socketId} from user ${user.username}`);
+          }
+        }
+      }
+    })
+  })
+})
+
+io.use(socketCookieParser())
+io.use(async function(socket, next) {
+  const authToken = socket.request.cookies["AuthToken"]
+  if (authToken == undefined || authToken == null) {
+    socket.request.user = null;
+    next();
+    return;
+  }
+  var client = new MongoClient(app.get('databaseUrl'))
+  try {
+    await client.connect()
+    var users = client.db('scoreboard').collection('users')
+    var user = await users.findOne({'token': authToken})
+    if (user == undefined) {
+      user = null;
+    }
+    socket.request.user = user;
+    next()
+  }
+  catch (e) {
+    console.dir(e)
+    socket.request.user = null;
+    next()
+  }
+  finally {
+    client.close()
+  }
+});
+io.sockets.on('connection', async function(socket) {
+
+  if (socket.request.user != null) {
+    var client = new MongoClient(app.get('databaseUrl'))
+    var authToken = socket.request.cookies['AuthToken']
+    try {
+      await client.connect()
+      var users = client.db('scoreboard').collection('users')
+      await users.updateOne({'token': authToken}, { $push: {'sockets': socket.id} });
+    }
+    finally {
+      client.close()
+    }
+  }
+
+  socket.on('disconnect', async function() {
+    var authToken = socket.request.cookies['AuthToken']
+    if (socket.request.user != null) {
+      var client = new MongoClient(app.get('databaseUrl'))
+      try {
+        await client.connect()
+        var users = client.db('scoreboard').collection('users')
+        var result = await users.updateOne({'token': authToken}, { $pull: {'sockets': socket.id} });
+      }
+      finally {
+        client.close()
+      }
+    }
+  })
+})
+app.set('io', io)
 
 /**
  * Create HTTP server.
