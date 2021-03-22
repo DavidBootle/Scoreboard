@@ -44,7 +44,7 @@ const MASTER_PASSWORD = process.env.MASTER_PASSWORD;
 
 var MongoClient = require('mongodb').MongoClient;
 
-var url = process.env.DATABASE_URL || "mongodb://localhost:27017/";
+var url = process.env.DATABASE_URL || "mongodb://localhost:27017/?useUnifiedTopology=true";
 app.set('databaseUrl', url);
 
 async function setupDatabase() {
@@ -146,7 +146,7 @@ io.use(async function(socket, next) {
 io.sockets.on('connection', async function(socket) {
 
   if (socket.request.user != null) {
-    var client = new MongoClient(app.get('databaseUrl'))
+    var client = new MongoClient(app.get('databaseUrl'));
     var authToken = socket.request.cookies['AuthToken']
     try {
       await client.connect()
