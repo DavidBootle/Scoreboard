@@ -4,4 +4,10 @@ small.is-valid {
 small.is-invalid {
   color: red; }
 
+.delete-button {
+  color: red;
+  background-color: Transparent;
+  border: none;
+  overflow: hidden; }
+
 /*# sourceMappingURL=style.css.map */

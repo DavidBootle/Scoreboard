@@ -17,6 +17,8 @@ const requireAuth = (req, res, next) => {
 
 router.get('/', requireAuth, async function (req, res) {
 
+    var confirm = req.query.confirm == 'false' ? false : true
+
     var client = new MongoClient(req.app.get('databaseUrl'));
 
     try {
@@ -28,7 +30,8 @@ router.get('/', requireAuth, async function (req, res) {
         res.render('teams', {
             title: 'Teams',
             teams: teams,
-            user: req.user
+            user: req.user,
+            confirm: confirm
         });
     }
     catch (e) {
@@ -114,6 +117,56 @@ router.post('/newteam', requireAuth, async function (req, res) {
     }
     finally {
         client.close()
+    }
+})
+
+router.post('/removeteam', requireAuth, async (req, res) => {
+    var id = req.body.id;
+
+    var client = new MongoClient(req.app.get('databaseUrl'));
+
+    try {
+        await client.connect();
+
+        var teams = client.db('scoreboard').collection('teams');
+
+        const doc = {
+            id: id
+        };
+        const result = await teams.deleteOne(doc);
+
+        // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
+        // ERROR CODE SET 003
+        // Location for client: /javascripts/teams.js
+        const errorCode = {
+            DATABASE_ERROR: 'database_error',
+            FAILED_DELETE: 'failed_delete'
+        }
+
+        if (result.deletedCount == 0) {
+            res.json({
+                ok: false,
+                reason: 'Failed to delete',
+                errorCode: errorCode.FAILED_DELETE
+            });
+        } else {
+            // update clients
+            var io = req.app.get('io');
+            io.emit('scoreboard-update');
+
+            res.json({
+                ok: true
+            });
+        }
+    } catch (e) {
+        res.json({
+            ok: false,
+            reason: 'Database error',
+            errorCode: errorCode.DATABASE_ERROR
+        });
+        console.dir(e);
+    } finally {
+        client.close();
     }
 })
 
