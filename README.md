@@ -156,7 +156,9 @@ This page is protected, which means you must be logged in to access it. Attempti
 ## Login (`/login`)
 This page allows you to login to the site. You can also be redirected to this site by other pages that are protected.
 
-The page can take one query argument, `to`, that defines where the user should be sent after login is completed. The value of this argument should be URI encoded. 
+The page can take one query argument, `to`, that defines where the user should be sent after login is completed. The value of this argument should be URI encoded. If the parameter is not defined, the default is `/`.
+
+This page will also automatically redirect to the `to` query parameter if it is loaded and the user is logged in. This means that if you have a number of windows that have been logged out, you can log into one of them, then simply refresh the rest.
 
 ## Logoff (`/logoff`)
 Navigating to this page will log the user out and redirect them to the home page. There is currently no specification for where the user should be sent once logged out, since the only unprotected page is the homepage.
