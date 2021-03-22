@@ -21,7 +21,7 @@ block content
                         td(class='col-4')= team.name
                         td(class='col-4')= team.id 
                         td(class='col-4')= team.score
-                        td(class='col-1'): button(onclick='removeTeam("' + team.id + '")', class="delete-button"): i(class="fas fa-trash")
+                        td(class='col-1'): button(onclick='removeTeam("' + team.id + '", ' + confirm + ')', class="delete-button"): i(class="fas fa-trash")
             else
                 tr(class='score-row')
                     th(scope='row', class='col-2')= '---'

@@ -59,9 +59,21 @@ async function newTeam() {
     }
 }
 
-async function removeTeam(id) {
+async function removeTeam(id, confirm) {
 
     console.log("ID: ", id);
+
+    var confirmed;
+
+    if (confirm) {
+        confirmed = window.confirm('Are you sure? This cannot be undone.')
+    } else {
+        confirmed = true;
+    }
+
+    if (!confirmed) {
+        return;
+    }
 
     const response = await fetch('/teams/removeteam', {
         method: 'POST',

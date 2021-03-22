@@ -17,6 +17,8 @@ const requireAuth = (req, res, next) => {
 
 router.get('/', requireAuth, async function (req, res) {
 
+    var confirm = req.query.confirm == 'false' ? false : true
+
     var client = new MongoClient(req.app.get('databaseUrl'));
 
     try {
@@ -28,7 +30,8 @@ router.get('/', requireAuth, async function (req, res) {
         res.render('teams', {
             title: 'Teams',
             teams: teams,
-            user: req.user
+            user: req.user,
+            confirm: confirm
         });
     }
     catch (e) {
