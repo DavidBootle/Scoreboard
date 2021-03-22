@@ -1,6 +1,8 @@
 function addLogoffListener(socket) {
 
     socket.on("logoff", () => {
-        location.reload()
+        setTimeout(() => {
+            location.reload()
+        }, 1000);
     })
 }
