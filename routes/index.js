@@ -14,7 +14,7 @@ router.get('/', async function (req, res) {
     await client.connect();
 
     var dbo = client.db('scoreboard');
-    var teams = await dbo.collection('teams').find({}).toArray();
+    var teams = await dbo.collection('teams').find({}).sort({'score': -1, '_id': 1}).toArray();
 
     res.render('index', {
       title: 'Scoreboard',
