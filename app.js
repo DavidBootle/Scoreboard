@@ -16,6 +16,7 @@ const generateAuthToken = () => {
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var toolsRouter = require('./routes/teams');
+const { isObject } = require('util');
 
 var app = express();
 
@@ -68,11 +69,16 @@ app.use('/teams', toolsRouter);
 
 app.get('/login', function(req, res) {
   var toURL = req.query.to || encodeURIComponent('/')
-  res.render('login', {
-    title: 'Login',
-    forwardURL: decodeURIComponent(toURL),
-    user: req.user
-  })
+
+  if (req.user != null) {
+    res.redirect(decodeURIComponent(toURL));
+  } else {
+    res.render('login', {
+      title: 'Login',
+      forwardURL: decodeURIComponent(toURL),
+      user: req.user
+    })
+  }
 })
 
 app.post('/login', async function(req, res) {
@@ -134,8 +140,21 @@ app.post('/login', async function(req, res) {
 })
 
 app.get('/logoff', (req, res) => {
-  res.clearCookie('AuthToken')
-  res.redirect('/')
+  var io = req.app.get('io');
+  var user = req.user;
+
+  res.clearCookie('AuthToken');
+
+  if (user != null && user != undefined) {
+    if (user.sockets != undefined) {
+      for (socketId of user.sockets) {
+        io.to(socketId).emit('logoff');
+        console.log(`Sent logoff event to socket ${socketId}`);
+      }
+    }
+  }
+
+  res.redirect('/');
 })
 
 // catch 404 and forward to error handler

@@ -6,7 +6,12 @@ const requireAuth = (req, res, next) => {
     if (req.user) {
         next();
     } else {
-        res.redirect(`/login?to=${encodeURIComponent(req.originalUrl)}`)
+        if (req.method == "GET") {
+            res.redirect(`/login?to=${encodeURIComponent(req.originalUrl)}`)
+        }
+        else {
+            res.status(401).send('Invalid authorization token');
+        }
     }
 };
 

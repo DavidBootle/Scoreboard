@@ -30,6 +30,12 @@ async function newTeam() {
             'score': score
         })
     })
+
+    if (response.status == 401) {
+        showAlert('Unauthorized. Please log in.')
+        return
+    }
+
     const data = await response.json();
 
     // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
