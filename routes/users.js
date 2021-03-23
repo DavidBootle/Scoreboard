@@ -16,6 +16,14 @@ const requireAuth = (req, res, next) => {
     }
 };
 
+const requireMasterAuth = (req, res, next) => {
+  if (req.user.accountType == 'master') {
+    next();
+  } else {
+    res.status(403).send('Must be master user to access this page.')
+  }
+}
+
 router.get('/', requireAuth, async function (req, res) {
 
   var client = new MongoClient(req.app.get('databaseUrl'));
@@ -275,7 +283,82 @@ router.post('/changepassword', requireAuth, async (req, res) => {
   finally {
     client.close()
   }
+});
 
+router.get('/master/logoutuser', requireAuth, requireMasterAuth, async (req, res) => {
+
+  var client = new MongoClient(req.app.get('databaseUrl'));
+
+  try {
+    await client.connect()
+
+    var usersCollection = client.db('scoreboard').collection('users');
+
+    var users = await usersCollection.find({'accountType': { $ne: 'master'}}).sort({'username': 1}).toArray();
+
+    res.render('masterlogoutuser', {
+      title: "Log Out A User",
+      user: req.user,
+      users: users
+    })
+  }
+  catch (e) {
+    res.render('error', {
+      message: "Failed to load",
+      error: e
+    });
+    console.dir(e);
+  }
+  finally {
+    client.close();
+  }
 })
+
+router.post('/master/logoutuser', requireAuth, requireMasterAuth, async (req, res) => {
+
+  var username = req.body.username;
+
+  var client = new MongoClient(req.app.get('databaseUrl'));
+
+  // log out all connected sockets for that user
+  try {
+    await client.connect()
+    
+    var users = client.db('scoreboard').collection('users')
+    
+    const result = await users.updateOne({'username': username}, {$unset: {'token': ''}})
+
+    var user = await users.findOne({'username': username});
+
+    if (user != undefined) {
+      if (user.sockets != undefined) {
+        for (socketId of user.sockets) {
+          var io = req.app.get('io');
+          io.to(socketId).emit('logoff');
+        }
+        res.json({
+          ok: true
+        });
+        return
+      }
+    } else {
+      res.json({
+        ok: false,
+        reason: 'User does not exist'
+      })
+      return
+    }
+  }
+  catch (e) {
+    res.json({
+      ok: false,
+      reason: 'Database error'
+    })
+    console.dir(e);
+  }
+  finally {
+    client.close()
+  }
+});
 
 module.exports = router;

@@ -1,0 +1,28 @@
+extends subpage
+
+block content 
+
+    script(src='/javascripts/formutils.js')
+    script(src='/javascripts/users.js')
+    script(src='/javascripts/bootstrap.min.js')
+
+    //- Good Alert
+    div(id='alert-box')
+
+    div(id='page-content')
+        h1 Log Out A User
+        form(novalidate)
+            div(class='form-group mb-3')
+                label(for='user') User
+                select(class='form-control', id='user', name='user')
+                    each selectUser in users
+                        option(value=selectUser.username)=selectUser.username
+
+        button(onclick='logoutUser()', class='btn btn-primary') Log Out
+        a(class='btn btn-outline-secondary ms-1', href='/teams') Cancel
+    
+    script(src="/socket.io/socket.io.js")
+    script(src="/javascripts/socketutils.js")
+    script.
+        var socket = io()
+        addLogoffListener(socket);
