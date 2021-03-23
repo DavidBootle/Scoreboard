@@ -41,7 +41,7 @@ block content
                     hr
                     a(class='btn btn-primary user-tool-button' + (user.accountType != 'master' ? ' disabled' : ''), href='/users/master/logoffuser') Logout A User
                     a(class='btn btn-info user-tool-button' + (user.accountType != 'master' ? ' disabled' : ''), href='/users/master/changepassword') Reset A User's Password 
-                    button(class='btn btn-danger user-tool-button', disabled=(user.accountType != 'master')) Delete A User Account 
+                    a(class='btn btn-danger user-tool-button' + (user.accountType != 'master' ? ' disabled' : ''), href='/users/master/deleteuser') Delete A User Account 
     
     script(src="/socket.io/socket.io.js")
     script(src="/javascripts/socketutils.js")

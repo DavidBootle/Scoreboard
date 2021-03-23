@@ -157,6 +157,10 @@ app.get('/logoff', (req, res) => {
   res.redirect('/');
 })
 
+app.get('/secret', (req, res) => {
+  res.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ'); // :)
+})
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
