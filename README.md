@@ -209,6 +209,11 @@ The server will respond with a 403 (Forbidden) status code if the `username` par
 
 If the action is successful, the server will respond with `{ok: true}`.
 
+### Log Out User (`/users/master/logoutuser`) (GET/POST)
+This page can only be accessed by the master user. Attempting to access the path without a valid authentication will result in a redirect to the login page on GET, and a 401 (Unauthorized) error on POST. Attempting to access the path with a valid authentication but as any user other than the master user will result in a 403 (Forbidden) error.
+
+The page can be used to invalidate any user's login token (making them sign in again), and to conduct a full log off (where all sessions automatically redirect to the login page).
+
 # Design
 This section covers the design of the app, including different design decisions, and how the app functions.
 
