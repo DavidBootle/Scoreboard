@@ -197,6 +197,18 @@ If the user was successfully deleted, the server will respond with `{ ok: true }
 
 When `/users` recieves a success message from the server, it redirects the user to the login page.
 
+### Change Password (`/users/changepassword`) (GET)
+This page allows a user to change their password. The page has three inputs: a hidden input containing the username of the authenticated user and two password inputs, one for the password, and the other to confirm the password. This page cannot be accessed by unauthorized users. You can access this page by clicking the `Reset Password` button on the Users page.
+
+### Change Password (`/users/changepassword`) (POST)
+This path instructs the server to change a user password. It takes the following parameters: `username` and `password`.
+
+The server will respond with a 401 (Unauthorized) status code if you attempt to access this path without proper authorization.
+
+The server will respond with a 403 (Forbidden) status code if the `username` parameter does not match the username of the authenticated user, or the `username` parameter is the master user.
+
+If the action is successful, the server will respond with `{ok: true}`.
+
 # Design
 This section covers the design of the app, including different design decisions, and how the app functions.
 
