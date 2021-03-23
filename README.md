@@ -183,7 +183,7 @@ When this path is called, the server checks to make sure that the `username` par
 
 The server may respond with status code 403 (Forbidden) under the following circumstances: the user to be deleted does not match the authenticated user, or the user to be deleted was the master user. In both cases, the server will also respond with a JSON object in the following format:
 
-```json
+```javascript
 {
   ok: false,
   reason: 'Error message',
