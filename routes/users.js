@@ -117,4 +117,84 @@ router.post('/newuser', requireAuth, async function (req, res) {
   }
 })
 
+router.post('/deleteuser', requireAuth, async (req, res) => {
+
+  var username = req.body.username;
+
+  // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
+  // ERROR CODE SET 005
+  // Location for client: /javascripts/users.js
+  const errorCode = {
+    DATABASE_ERROR: 'DATABASE_ERROR',
+    FAILED_DELETE: 'FAILED_DELETE',
+    INVALID_USER: 'INVALID_USER',
+    IS_MASTER_USER: 'IS_MASTER_USER'
+  }
+
+  // check to see if user is the same
+  if (req.user.username != username) {
+    res.status(403).json({
+      ok: false,
+      reason: 'Cannot delete another user.',
+      errorCode: errorCode.INVALID_USER
+    });
+    return
+  }
+
+  // check to see if user being deleted is the master user
+  if (username == process.env.MASTER_USER) {
+    res.status(403).json({
+      ok: false,
+      reason: 'Cannot delete the master user.',
+      errorCode: errorCode.IS_MASTER_USER
+    });
+    return
+  }
+
+  var client = new MongoClient(req.app.get('databaseUrl'));
+
+  try {
+    await client.connect()
+
+    var users = client.db('scoreboard').collection('users');
+
+    var result = await users.deleteOne({'username': username});
+
+    if (result.deletedCount == 0) {
+      res.json({
+        ok: false,
+        reason: 'Failed to delete',
+        errorCode: errorCode.FAILED_DELETE
+      });
+      return
+    } else {
+      // update clients
+      var io = req.app.get('io');
+      io.emit('user-update');
+
+      // logoff users
+      if (user.sockets != undefined) {
+        for (socketId of user.sockets) {
+          io.to(socketId).emit('logoff');
+        }
+      }
+
+      res.json({
+        ok: true
+      });
+    }
+  }
+  catch (e) {
+    res.json({
+      ok: false,
+      reason: 'Database error',
+      errorCode: errorCode.DATABASE_ERROR
+    });
+    console.dir(e);
+  }
+  finally {
+    client.close()
+  }
+})
+
 module.exports = router;
