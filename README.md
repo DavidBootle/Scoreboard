@@ -214,6 +214,11 @@ This page can only be accessed by the master user. Attempting to access the path
 
 The page can be used to invalidate any user's login token (making them sign in again), and to conduct a full log off (where all sessions automatically redirect to the login page).
 
+### Change User Password (`/users/master/logoutuser`) (GET)
+This page can only be accessed by the master user. Attempting to access the path without a valid authentication will result in a redirect to the login page. Attempting to access the path with a valid authentication but as any user other than the master user will result in a 403 (Forbidden) error.
+
+This page can be used by the master user to change the password of any user account.
+
 # Design
 This section covers the design of the app, including different design decisions, and how the app functions.
 
