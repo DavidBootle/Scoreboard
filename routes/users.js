@@ -228,8 +228,8 @@ router.post('/changepassword', requireAuth, async (req, res) => {
     IS_MASTER_USER: 'IS_MASTER_USER'
   }
 
-  // check to see if user is the same
-  if (req.user.username != username) {
+  // check to see if user is the same or if master user is requesting password change
+  if (req.user.username != username && req.user.accountType != 'master') {
     res.status(403).json({
       ok: false,
       reason: 'Cannot change the password of another user.',
@@ -257,7 +257,7 @@ router.post('/changepassword', requireAuth, async (req, res) => {
 
     // change password
     var newPassword = await bcrypt.hash(password, 10);
-    var result = await users.updateOne({'username': req.user.username}, {$set: {'password': newPassword}})
+    var result = await users.updateOne({'username': username}, {$set: {'password': newPassword}})
 
     if (result.modifiedCount == 0) {
       res.json({
@@ -360,5 +360,33 @@ router.post('/master/logoutuser', requireAuth, requireMasterAuth, async (req, re
     client.close()
   }
 });
+
+router.get('/master/changepassword', requireAuth, requireMasterAuth, async (req, res) => {
+  var client = new MongoClient(req.app.get('databaseUrl'));
+
+  try {
+    await client.connect()
+
+    var usersCollection = client.db('scoreboard').collection('users');
+
+    var users = await usersCollection.find({'accountType': { $ne: 'master'}}).sort({'username': 1}).toArray();
+
+    res.render('masterresetuserpassword', {
+      title: "Reset A User's Password",
+      user: req.user,
+      users: users
+    })
+  }
+  catch (e) {
+    res.render('error', {
+      message: "Failed to load",
+      error: e
+    });
+    console.dir(e);
+  }
+  finally {
+    client.close();
+  }
+})
 
 module.exports = router;
