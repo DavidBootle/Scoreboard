@@ -197,4 +197,85 @@ router.post('/deleteuser', requireAuth, async (req, res) => {
   }
 })
 
+router.get('/changepassword', requireAuth, (req, res) => {
+
+  res.render('changepassword', {
+    title: 'Change Password',
+    user: req.user
+  })
+});
+
+router.post('/changepassword', requireAuth, async (req, res) => {
+
+  var username = req.body.username;
+  var password = req.body.password;
+
+  // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
+  // ERROR CODE SET 006
+  // Location for client: /javascripts/users.js
+  const errorCode = {
+    DATABASE_ERROR: 'DATABASE_ERROR',
+    FAILED_CHANGE: 'FAILED_CHANGE',
+    INVALID_USER: 'INVALID_USER',
+    IS_MASTER_USER: 'IS_MASTER_USER'
+  }
+
+  // check to see if user is the same
+  if (req.user.username != username) {
+    res.status(403).json({
+      ok: false,
+      reason: 'Cannot change the password of another user.',
+      errorCode: errorCode.INVALID_USER
+    });
+    return
+  }
+
+  // check to see if user being deleted is the master user
+  if (username == process.env.MASTER_USER) {
+    res.status(403).json({
+      ok: false,
+      reason: 'Cannot change the password of the master user.',
+      errorCode: errorCode.IS_MASTER_USER
+    });
+    return
+  }
+
+  var client = new MongoClient(req.app.get('databaseUrl'));
+
+  try {
+    await client.connect()
+
+    var users = client.db('scoreboard').collection('users');
+
+    // change password
+    var newPassword = await bcrypt.hash(password, 10);
+    var result = await users.updateOne({'username': req.user.username}, {$set: {'password': newPassword}})
+
+    if (result.modifiedCount == 0) {
+      res.json({
+        ok: false,
+        reason: 'Failed to change password',
+        errorCode: errorCode.FAILED_CHANGE
+      });
+      return
+    } else {
+      res.json({
+        ok: true
+      })
+    }
+  }
+  catch (e) {
+    res.json({
+      ok: false,
+      reason: 'Database error',
+      errorCode: errorCode.DATABASE_ERROR
+    });
+    console.dir(e)
+  }
+  finally {
+    client.close()
+  }
+
+})
+
 module.exports = router;
