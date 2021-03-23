@@ -176,6 +176,27 @@ This page is built for managing users. On the left side of the screen is a list 
 ### New User (`/users/newuser`)
 This page contains a form that allows you to add a new user. You must be an authenticated user to access this page via GET or POST. You can access this page by clicking the "Add New User" button under the user list in the Users page.
 
+### Delete User (`/users/deleteuser`) (POST)
+This path instructs the server to delete a user account. The following parameters are required: `username`. In addition, this path requires authorization. Attempting to access the path without authorization will result in the server returning with a status of 401 (Unauthorized).
+
+When this path is called, the server checks to make sure that the `username` parameter is the same as the authorized user's username. This way, any user can delete their own account, but they cannot delete other user's accounts. The `Delete My Account` button on the Users page is by default supplied with the username of the currently authorized user. However, it is still possible to attempt to contact the server and delete another account using console commands.
+
+The server may respond with status code 403 (Forbidden) under the following circumstances: the user to be deleted does not match the authenticated user, or the user to be deleted was the master user. In both cases, the server will also respond with a JSON object in the following format:
+
+```json
+{
+  ok: false,
+  reason: 'Error message',
+  errorCode: 'ERROR_CODE'
+}
+```
+
+The server may also return a response with `ok: false` if the server failed to delete the user or an error occurs during execution. In both cases, `reason` and `errorCode` will also be provided to state the problem.
+
+If the user was successfully deleted, the server will respond with `{ ok: true }` and no other parameters. The server will then send the `user-update` command to all `user-update` listeners. The server will also send the `logoff` event to all clients connected as that user, causing a full logoff of the users account.
+
+When `/users` recieves a success message from the server, it redirects the user to the login page.
+
 # Design
 This section covers the design of the app, including different design decisions, and how the app functions.
 
