@@ -151,3 +151,26 @@ async function changePassword() {
         return
     }
 }
+
+async function logoutUser() {
+    var user = $('#user').val();
+
+    $('#alert-box').empty()
+
+    const response = await fetch('/users/master/logoutuser', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username: user })
+    })
+
+    const data = await response.json()
+
+    if (data.ok == true) {
+        showAlert('User logged out. <a href="/users" class="alert-link">Click here</a> to go back to Users.', 'success');
+    } else {
+        showAlert(data.reason);
+        return
+    }
+}

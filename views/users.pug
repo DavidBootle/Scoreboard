@@ -35,7 +35,7 @@ block content
                 h4(class='card-subtitle mb-2 text-muted')= user.username
                 hr
                 a(class='btn btn-primary user-tool-button', href='/logoff') Logout
-                a(class='btn btn-info user-tool-button', href='/users/changepassword', disabled=(user.accountType == 'master')) Reset Password
+                a(class='btn btn-info user-tool-button' + (user.accountType == 'master' ? ' disabled' : ''), href='/users/changepassword') Reset Password
                 button(class='btn btn-danger user-tool-button', disabled=(user.accountType == 'master'), onclick='deleteUser("' + user.username + '")') Delete My Account
                 if user.accountType == 'master'
                     hr

@@ -13,4 +13,7 @@ small.is-invalid {
 .user-tool-button {
   margin-right: 10px; }
 
+select {
+  -webkit-appearance: none; }
+
 /*# sourceMappingURL=style.css.map */
