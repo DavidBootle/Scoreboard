@@ -183,7 +183,7 @@ When this path is called, the server checks to make sure that the `username` par
 
 The server may respond with status code 403 (Forbidden) under the following circumstances: the user to be deleted does not match the authenticated user, or the user to be deleted was the master user. In both cases, the server will also respond with a JSON object in the following format:
 
-```json
+```javascript
 {
   ok: false,
   reason: 'Error message',
@@ -196,6 +196,18 @@ The server may also return a response with `ok: false` if the server failed to d
 If the user was successfully deleted, the server will respond with `{ ok: true }` and no other parameters. The server will then send the `user-update` command to all `user-update` listeners. The server will also send the `logoff` event to all clients connected as that user, causing a full logoff of the users account.
 
 When `/users` recieves a success message from the server, it redirects the user to the login page.
+
+### Change Password (`/users/changepassword`) (GET)
+This page allows a user to change their password. The page has three inputs: a hidden input containing the username of the authenticated user and two password inputs, one for the password, and the other to confirm the password. This page cannot be accessed by unauthorized users. You can access this page by clicking the `Reset Password` button on the Users page.
+
+### Change Password (`/users/changepassword`) (POST)
+This path instructs the server to change a user password. It takes the following parameters: `username` and `password`.
+
+The server will respond with a 401 (Unauthorized) status code if you attempt to access this path without proper authorization.
+
+The server will respond with a 403 (Forbidden) status code if the `username` parameter does not match the username of the authenticated user, or the `username` parameter is the master user.
+
+If the action is successful, the server will respond with `{ok: true}`.
 
 # Design
 This section covers the design of the app, including different design decisions, and how the app functions.

@@ -98,3 +98,56 @@ async function deleteUser(username) {
         return
     }
 }
+
+async function changePassword() {
+    
+    var username = $('#username').val()
+    var password = $('#password').val()
+    var passwordConfirmation = $('#passwordConfirmation').val()
+
+    $('#alert-box').empty()
+
+    // check if passwords match
+    if (password != passwordConfirmation) {
+        showAlert('Passwords must match');
+        return;
+    }
+
+    const doc = {
+        username: username,
+        password: password
+    }
+
+    var response = await fetch('/users/changepassword', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(doc)
+    });
+
+    if (response.status == 403) {
+        var error = await response.json();
+        showAlert('Forbidden: ' + error.reason);
+        return
+    }
+
+    const data = await response.json()
+
+    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
+    // ERROR CODE SET 006
+    // Location for server: /routes/users.js
+    const errorCode = {
+        DATABASE_ERROR: 'DATABASE_ERROR',
+        FAILED_CHANGE: 'FAILED_CHANGE',
+        INVALID_USER: 'INVALID_USER',
+        IS_MASTER_USER: 'IS_MASTER_USER'
+    }
+
+    if (data.ok == true) {
+        showAlert('Password changed. <a href="/users" class="alert-link">Click here</a> to go back to Users.', 'success');
+    } else {
+        showAlert(data.reason);
+        return
+    }
+}
