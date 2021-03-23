@@ -39,7 +39,7 @@ block content
                 button(class='btn btn-danger user-tool-button', disabled=(user.accountType == 'master'), onclick='deleteUser("' + user.username + '")') Delete My Account
                 if user.accountType == 'master'
                     hr
-                    button(class='btn btn-primary user-tool-button', disabled=(user.accountType != 'master')) Logout A User
+                    a(class='btn btn-primary user-tool-button' + (user.accountType != 'master' ? ' disabled' : ''), href='/users/master/logoffuser') Logout A User
                     button(class='btn btn-info user-tool-button', disabled=(user.accountType != 'master')) Reset A User's Password 
                     button(class='btn btn-danger user-tool-button', disabled=(user.accountType != 'master')) Delete A User Account 
     
