@@ -32,7 +32,7 @@ block content
                 h3(class='card-title') Your Profile 
                 h4(class='card-subtitle mb-2 text-muted')= user.username
                 hr
-                button(class='btn btn-primary user-tool-button') Logout
+                a(class='btn btn-primary user-tool-button', href='/logoff') Logout
                 button(class='btn btn-info user-tool-button', disabled=(user.accountType == 'master')) Reset Password
                 button(class='btn btn-danger user-tool-button', disabled=(user.accountType == 'master')) Delete My Account
                 if user.accountType == 'master'
@@ -46,3 +46,4 @@ block content
     script.
         var socket = io()
         addLogoffListener(socket);
+        addUserListener(socket);

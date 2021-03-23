@@ -9,3 +9,9 @@ function addScoreboardListener(socket) {
         location.reload();
     })
 }
+
+function addUserListener(socket) {
+    socket.on('user-update', () => {
+        location.reload();
+    })
+}
