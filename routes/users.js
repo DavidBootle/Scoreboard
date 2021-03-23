@@ -140,7 +140,7 @@ router.post('/deleteuser', requireAuth, async (req, res) => {
   }
 
   // check to see if user is the same
-  if (req.user.username != username) {
+  if (req.user.username != username && req.user.accountType != 'master') {
     res.status(403).json({
       ok: false,
       reason: 'Cannot delete another user.',
@@ -165,6 +165,8 @@ router.post('/deleteuser', requireAuth, async (req, res) => {
     await client.connect()
 
     var users = client.db('scoreboard').collection('users');
+
+    var user = await users.findOne({'username': username});
 
     var result = await users.deleteOne({'username': username});
 
@@ -373,6 +375,34 @@ router.get('/master/changepassword', requireAuth, requireMasterAuth, async (req,
 
     res.render('masterresetuserpassword', {
       title: "Reset A User's Password",
+      user: req.user,
+      users: users
+    })
+  }
+  catch (e) {
+    res.render('error', {
+      message: "Failed to load",
+      error: e
+    });
+    console.dir(e);
+  }
+  finally {
+    client.close();
+  }
+})
+
+router.get('/master/deleteuser', requireAuth, requireMasterAuth, async (req, res) => {
+  var client = new MongoClient(req.app.get('databaseUrl'));
+
+  try {
+    await client.connect()
+
+    var usersCollection = client.db('scoreboard').collection('users');
+
+    var users = await usersCollection.find({'accountType': { $ne: 'master'}}).sort({'username': 1}).toArray();
+
+    res.render('masterdeleteuser', {
+      title: "Delete User",
       user: req.user,
       users: users
     })

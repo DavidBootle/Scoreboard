@@ -54,7 +54,7 @@ async function newUser() {
     
 }
 
-async function deleteUser(username) {
+async function deleteUser(username, redirect=true) {
 
     if (!confirm('Are you sure? This cannot be undone.')) { return }
     if (!confirm('Are you absolutely sure?')) { return }
@@ -91,8 +91,10 @@ async function deleteUser(username) {
         IS_MASTER_USER: 'IS_MASTER_USER'
     }
 
-    if (data.ok == true) {
+    if (data.ok == true && redirect) {
         window.location.assign('/login?to=' + encodeURIComponent('/users'))
+    } else if (data.ok) {
+        showAlert('User deleted. <a href="/users" class="alert-link">Click here</a> to go back to Users.', 'success');
     } else {
         showAlert(data.reason);
         return
