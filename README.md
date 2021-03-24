@@ -158,6 +158,11 @@ This post path removes a team from the scoreboard. It takes a JSON object that m
 
 Opening `/teams` with the query parameter `confirm` set to `false` will disable the confirmation messages. Example: `/teams?confirm=false`. Opening the page with the `confirm` query parameter set to anything else will enable confirmation messages.
 
+### Edit Team (`/teams/editteam`) (GET|POST)
+GET: This page is a form that allows you to change the name and/or id of a team. The name and id form inputs are validated the same way that they are when creating a new team. When loading this page, the url query parameter `id` is required. If not given, the server will return status code 400 (Bad Context) with a message explaining the need for the parameter. In addition, the `id` parameter must correlate to an actual team id. If a team with that id is not found, then the server will return 404 (Not Found) with a message stating the team doesn't exist. If `id` is given and is a valid team id, then the server will send the actual page.
+
+POST: This path tells the server to attempt to update a team entry. The following parameteres are required: `id`, `name`, and `oldId`. `oldId` is the id of the team you want to change, `id` is the new team id, and `name` is the new team name. If the `id` parameter matches an already existing team entry that is not the team entry you are trying to change, then the server will respond with status code 409 (Conflict) along with a JSON data packet containing error information. 
+
 ## Login (`/login`)
 This page allows you to login to the site. You can also be redirected to this site by other pages that are protected.
 

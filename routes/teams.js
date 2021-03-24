@@ -170,4 +170,116 @@ router.post('/removeteam', requireAuth, async (req, res) => {
     }
 })
 
+router.get('/editteam', requireAuth, async (req, res) => {
+
+    var id = req.query.id;
+
+    if (id == undefined) {
+        res.status(400).send('Must include id parameter.');
+    }
+
+    var client = new MongoClient(req.app.get('databaseUrl'));
+
+    try {
+        await client.connect();
+
+        var teams = client.db('scoreboard').collection('teams');
+
+        var team = await teams.findOne({'id': id});
+
+        if (team == undefined || team == null) {
+            res.status(404).send("Team with identifier \"" + id + "\" doesn't exist.")
+        }
+
+        res.render('editteam', {
+            title: 'Edit Team',
+            user: req.user,
+            team: team
+        });
+    }
+    catch (e) {
+        res.render('error', {
+            message: 'Database error',
+            error: e
+        })
+    }
+    finally {
+        client.close()
+    }
+});
+
+router.post('/editteam', requireAuth, async (req, res) => {
+
+    var name = req.body.name;
+    var id = req.body.id;
+    var oldId = req.body.oldId;
+
+    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
+    // ERROR CODE SET 007
+    // Location for client: /javascripts/teams.js
+    const errorCode = {
+        DATABASE_ERROR: 'DATABASE_ERROR',
+        FAILED_UPDATE: 'FAILED_UPDATE',
+        TEAM_CONFLICTS: 'TEAM_CONFLICTS'
+    }
+
+    if (id == undefined) {
+        res.status(400).send('Must include id parameter');
+    }
+
+    if (name == undefined) {
+        res.status(400).send('Must include name parameter');
+    }
+
+    if (oldId == undefined) {
+        res.status(400).send('Must include oldId parameter');
+    }
+
+    var client = new MongoClient(req.app.get('databaseUrl'));
+
+    try {
+        await client.connect()
+
+        var teams = client.db('scoreboard').collection('teams');
+
+        var matchingTeam = await teams.findOne({'id': id});
+
+        if (matchingTeam != null && id != oldId) {
+            res.status(409).json({
+                ok: false,
+                reason: 'ID in use',
+                errorCode: errorCode.TEAM_CONFLICTS
+            }); return;
+        }
+
+        const result = await teams.updateOne({'id': oldId}, { $set: {'id': id, 'name': name} });
+
+        if (result.matchedCount == 0) {
+            res.json({
+                ok: false,
+                reason: 'No team was updated',
+                errorCode: errorCode.FAILED_UPDATE
+            })
+        } else {
+            res.json({
+                ok: true
+            })
+
+            // update clients
+            var io = req.app.get('io');
+            io.emit('scoreboard-update');
+        }
+    }
+    catch (e) {
+        res.status(500).json({
+            ok: false,
+            reason: 'Database error',
+            errorCode: errorCode.DATABASE_ERROR
+        })
+    }
+    finally {
+        client.close()
+    }
+});
+
 module.exports = router
