@@ -282,4 +282,95 @@ router.post('/editteam', requireAuth, async (req, res) => {
     }
 });
 
+router.get('/changescore', requireAuth, async (req, res) => {
+
+    var id = req.query.id || '';
+
+    var client = new MongoClient(req.app.get('databaseUrl'));
+
+    try {
+
+        await client.connect()
+
+        var teams = await client.db('scoreboard').collection('teams').find().sort({'id': 1}).toArray()
+
+        res.render('changescore', {
+            title: 'Change Score',
+            user: req.user,
+            teams: teams,
+            selectedTeamId: id.toString()
+        })
+    }
+    catch (e) {
+        res.render('error', {
+            message: 'Failed to load',
+            error: e
+        });
+        console.dir(e);
+    }
+    finally {
+        client.close()
+    }
+})
+
+router.post('/changescore', requireAuth, async (req, res) => {
+
+    var id = req.body.id;
+    var score = req.body.score;
+
+    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
+    // ERROR CODE SET 008
+    // Location for client: /javascripts/teams.js
+    const errorCode = {
+        DATABASE_ERROR: 'DATABASE_ERROR',
+        FAILED_UPDATE: 'FAILED_UPDATE'
+    }
+
+    if (id == undefined) {
+        res.status(400).send('"id" is a required parameter');
+        return;
+    }
+    if (score == undefined) {
+        res.status(400).send('"score" is a required parameter');
+        return;
+    }
+
+    var client = new MongoClient(req.app.get('databaseUrl'));
+
+    try {
+        await client.connect();
+
+        var teams = client.db('scoreboard').collection('teams');
+
+        var result = await teams.updateOne({'id': id}, { $set: {'score': score}});
+
+        if (result.modifiedCount == 0) {
+            res.json({
+                ok: false,
+                reason: "No team with that ID",
+                errorCode: errorCode.FAILED_UPDATE
+            });
+        } else {
+            res.json({
+                ok: true
+            })
+
+            // update clients
+            var io = req.app.get('io');
+            io.emit('scoreboard-update');
+        }
+    }
+    catch (e) {
+        res.status(500).json({
+            ok: false,
+            reason: 'Database error',
+            errorCode: errorCode.DATABASE_ERROR
+        })
+        console.dir(e);
+    }
+    finally {
+        client.close();
+    }
+})
+
 module.exports = router

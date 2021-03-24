@@ -165,3 +165,28 @@ async function editTeam() {
     }
 
 }
+
+async function changeScore() {
+
+    var id = $('#team').val()
+    var score = $('#score').val()
+
+    const response = await fetch('/teams/changescore', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id: id,
+            score: score
+        })
+    })
+
+    const data = await response.json();
+
+    if (data.ok) {
+        showAlert('Score updated. <a href="/teams" class="alert-link">Click here</a> to go back to Teams.', 'success');
+    } else {
+        showAlert(data.reason);
+    }
+}

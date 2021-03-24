@@ -1,0 +1,98 @@
+extends subpage
+
+block content 
+
+    script(src='/javascripts/formutils.js')
+    script(src='/javascripts/teams.js')
+    script(src='/javascripts/bootstrap.min.js')
+
+
+    script.
+
+        function validateScore(input) {
+            const scoreFeedbackId = '#scoreFeedback';
+
+            // requirement 1: must have a value
+            if (!requirement(input, scoreFeedbackId, "Score is required.", (value) => { return (value.length > 0) })) { return false }
+
+            // requirement 2: must not be greater than 30 digits
+            if (!requirement(input, scoreFeedbackId, "Must not be greater than 30 digits.", (value) => { return (value.length <= 30) })) { return false }
+
+            // requirement 3: must be numeric
+            if (!requirement(input, scoreFeedbackId, "Must be an integer.", (value) => { return (/^\-?[0-9]+$/.test(value)) })) { return false }
+
+            return true
+        }
+
+        function validateAndSubmit() {
+            if (validateScore('#score')) {
+                changeScore()
+            }
+        }
+
+        async function updateScore() {
+
+            $('#score').prop('disabled', true) // disable score input
+            $('#submit').prop('disabled', true) // disable send button
+
+            $('#score').val('Loading...');
+
+            var id = $('#team').val()
+
+            // get team's current score from server and update
+            var response = await fetch('/api/get/teamscore', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: id
+                })
+            })
+
+            /**
+             * If a good response is recieved, change the score in the box.
+             * The reason for only reacting to a good response is that a background process should not raise
+             * errors when it isn't even needed in the first place. Thus, it's better to just abandon the update.
+            */
+            if (response.status == 200) {
+                var score = await response.text()
+                $('#score').val(score);
+            } else {
+                $('#score').val('');
+                window.location.reload()
+            }
+            $('#score').prop('disabled', false);
+            $('#submit').prop('disabled', false);
+            
+        }
+
+    //- Good Alert
+    div(id='alert-box')
+
+    div(id='page-content')
+        h1 Change Score
+        form(novalidate)
+            div(class='form-group mb-3')
+                label(for='team') Team
+                select(class='form-control', id='team', name='team' onchange='updateScore()')
+                    each selectTeam in teams
+                        if selectTeam.id.toString() == selectedTeamId.toString()
+                            option(value=selectTeam.id, selected)= `${selectTeam.name} (${selectTeam.id})`
+                        else
+                            option(value=selectTeam.id)= `${selectTeam.name} (${selectTeam.id})`
+            div(class='form-group mb-3')
+                label(for='score') Score
+                input(class='form-control', id='score', type='text', name='score', placeholder='0', onkeyup='validateScore(this)')
+                div(class='invalid-feedback', id='scoreFeedback') 
+        button(onclick='validateAndSubmit()', class='btn btn-primary', id='submit') Update Score
+        a(class='btn btn-outline-secondary ms-1', href='/teams') Cancel
+    
+    script(src="/socket.io/socket.io.js")
+    script(src="/javascripts/socketutils.js")
+    script.
+        var socket = io()
+        addLogoffListener(socket);
+    
+    script.
+        updateScore();

@@ -16,6 +16,7 @@ const generateAuthToken = () => {
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var toolsRouter = require('./routes/teams');
+var apiRouter = require('./routes/api');
 const { isObject } = require('util');
 
 var app = express();
@@ -66,6 +67,7 @@ app.use(async function(req, res, next) {
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/teams', toolsRouter);
+app.use('/api', apiRouter);
 
 app.get('/login', function(req, res) {
   var toURL = req.query.to || encodeURIComponent('/')
