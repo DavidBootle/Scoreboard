@@ -108,3 +108,60 @@ async function removeTeam(id, confirm) {
         showAlert(data.reason);
     }
 }
+
+async function editTeam() {
+    var name = $('#name').val()
+    var id = $('#id').val()
+    var oldId = $('#oldId').val()
+
+    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
+    // ERROR CODE SET 007
+    // Location for server: /routes/teams.js
+    const errorCode = {
+        DATABASE_ERROR: 'DATABASE_ERROR',
+        FAILED_UPDATE: 'FAILED_UPDATE',
+        TEAM_CONFLICTS: 'TEAM_CONFLICTS'
+    }
+
+    // reset submission feedback
+    $('#alert-box').empty()
+
+    if (name == '' || id == '' || !/[0-9]{3}/.test(id)) {
+        return
+    }
+
+    const response = await fetch('/teams/editteam', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: name,
+            id: id,
+            oldId: oldId
+        })
+    });
+
+    switch (response.status) {
+        case 400: // Bad Request
+            var message = await response.text()
+            showAlert('Invalid parameters: ' + message)
+            return;
+    }
+
+    const data = await response.json();
+
+    if (data.ok) {
+        showAlert('Team data changed. <a href="/teams" class="alert-link">Click here</a> to go back to Teams.', 'success');
+        $('#oldId').val(id);
+    } else {
+        if (data.errorCode == errorCode.TEAM_CONFLICTS) {
+            $('#id').addClass('is-invalid');
+            $('#idFeedback').text('Team with that ID already exists')
+        }
+        else {
+            showAlert(data.reason);
+        }
+    }
+
+}

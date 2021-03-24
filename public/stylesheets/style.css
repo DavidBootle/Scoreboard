@@ -4,11 +4,11 @@ small.is-valid {
 small.is-invalid {
   color: red; }
 
-.delete-button {
-  color: red;
+.scoreboard-button {
   background-color: Transparent;
   border: none;
-  overflow: hidden; }
+  overflow: hidden;
+  display: inline; }
 
 .user-tool-button {
   margin-right: 10px; }
