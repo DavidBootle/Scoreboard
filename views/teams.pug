@@ -9,8 +9,8 @@ block content
         thead(class='thead-dark')
             tr
                 th(scope='col', class='col-1') #
-                th(scope='col', class='col-4') Name
                 th(scope='col', class='col-3') Team
+                th(scope='col', class='col-4') Name
                 th(scope='col', class='col-3') Rubees
                 th(scope='col', class='col-1'): a(href='/teams/newteam', title="New Team", class='text-primary new-team-button'): i(class="fas fa-plus")
         tbody
@@ -18,18 +18,18 @@ block content
                 each team, index in teams 
                     tr(class='score-row')
                         th(scope='row', class='col-1')= index + 1
-                        td(class='col-4')= team.name
-                        td(class='col-3')= team.id 
+                        td(class='col-3')= team.id
+                        td(class='col-4')= team.name 
                         td(class='col-3')= team.score
                         td(class='col-1')
-                            button(onclick='', class='scoreboard-button text-info', title="Change Score"): i(class='fas fa-coins')
+                            a(href='/teams/changescore?id=' + encodeURIComponent(team.id), class='scoreboard-button text-info', title="Change Score"): i(class='fas fa-coins')
                             a(href='/teams/editteam?id=' + encodeURIComponent(team.id), class='scoreboard-button text-warning', title="Edit Team Info"): i(class="fas fa-edit")
                             button(onclick='removeTeam("' + team.id + '", ' + confirm + ')', class="scoreboard-button text-danger", title="Delete Team"): i(class="fas fa-trash")
             else
                 tr(class='score-row')
                     th(scope='row', class='col-1')= '---'
-                    td(class='col-4')= '---'
                     td(class='col-3')= '---'
+                    td(class='col-4')= '---'
                     td(class='col-3')= '---'
                     td(class='col-1')
     

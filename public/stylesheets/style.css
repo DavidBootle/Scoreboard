@@ -4,11 +4,19 @@ small.is-valid {
 small.is-invalid {
   color: red; }
 
-.scoreboard-button {
+button.scoreboard-button {
   background-color: Transparent;
   border: none;
   overflow: hidden;
   display: inline; }
+
+a.scoreboard-button {
+  box-sizing: border-box;
+  height: 1em;
+  width: 100%;
+  outline: none;
+  text-decoration: none;
+  padding: 2px 6px 2px 6px; }
 
 .user-tool-button {
   margin-right: 10px; }

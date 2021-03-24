@@ -163,6 +163,9 @@ GET: This page is a form that allows you to change the name and/or id of a team.
 
 POST: This path tells the server to attempt to update a team entry. The following parameteres are required: `id`, `name`, and `oldId`. `oldId` is the id of the team you want to change, `id` is the new team id, and `name` is the new team name. If the `id` parameter matches an already existing team entry that is not the team entry you are trying to change, then the server will respond with status code 409 (Conflict) along with a JSON data packet containing error information. 
 
+### Change Score (`teams/changescore`) (GET|POST)
+// TODO add more documentation for this page
+
 ## Login (`/login`)
 This page allows you to login to the site. You can also be redirected to this site by other pages that are protected.
 
@@ -231,6 +234,13 @@ This page can be used by the master user to delete any user account.
 
 # Secret (`/secret`) (GET)
 It's a secret. :)
+
+# API
+
+## Get
+
+### Team Score (`/api/get/teamscore`)
+// TODO add documentation for this page
 
 # Design
 This section covers the design of the app, including different design decisions, and how the app functions.
