@@ -59,6 +59,11 @@ router.post('/newteam', requireAuth, async function (req, res) {
     var id = req.body.id;
     var score = req.body.score;
 
+    if (name == undefined || id == undefined || score == undefined) {
+        res.status(400).send('One or more required parameters are missing.');
+        return;
+    }
+
     var client = new MongoClient(req.app.get('databaseUrl'));
 
     // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
