@@ -130,13 +130,13 @@ $ sudo npm start
 # Usage
 Please note that **none of the features listed here are final**. The scoreboard is still in development, and some features, such as login, have not yet been implemented.
 
-## Scoreboard (`/`)
+## Scoreboard (`/`) (GET)
 The scoreboard or main page (`/`) displays all the teams, their identifier, and their scores.
 
-## Teams (`/teams`)
+## Teams (`/teams`) (GET) (AUTH REQUIRED)
 The teams page (`/tools`) contains a list of all the teams, their identifiers, and their scores, as well as tools used to manage the teams. This page is protected, which means that you must be logged in to access it. Attempting to access this page without being logged in will redirect you to the login page.
 
-### New Team (`/teams/newteam`)
+### New Team (`/teams/newteam`) (GET|POST) (AUTH REQUIRED)
 This page contains a form that allows you to add a new team to the scoreboard. You can access this page by clicking the plus (`+`) button in the top right corner of the team list on the teams page.
 
 In order to successfully add a team, the information inputted must pass the following checks:
@@ -153,38 +153,38 @@ If any of these checks fail, the offending input will be highlighted red. You ma
 
 This page is protected, which means you must be logged in to access it. Attempting to access this page without being logged in will redirect you to the login page.
 
-### Remove Team (`/teams/removeteam`) (POST)
+### Remove Team (`/teams/removeteam`) (POST) (AUTH REQUIRED)
 This post path removes a team from the scoreboard. It takes a JSON object that must include the `id` parameter. `id` is the id of the team to delete. This page must be accompanied by a valid auth token, or a 401 error will be returned. You can delete a team by clicking the red trash icon next to a team on the `teams` page. Clicking this button will open a confirmation window to confirm that the team should be deleted.
 
 Opening `/teams` with the query parameter `confirm` set to `false` will disable the confirmation messages. Example: `/teams?confirm=false`. Opening the page with the `confirm` query parameter set to anything else will enable confirmation messages.
 
-### Edit Team (`/teams/editteam`) (GET|POST)
+### Edit Team (`/teams/editteam`) (GET|POST) (AUTH REQUIRED)
 GET: This page is a form that allows you to change the name and/or id of a team. The name and id form inputs are validated the same way that they are when creating a new team. When loading this page, the url query parameter `id` is required. If not given, the server will return status code 400 (Bad Context) with a message explaining the need for the parameter. In addition, the `id` parameter must correlate to an actual team id. If a team with that id is not found, then the server will return 404 (Not Found) with a message stating the team doesn't exist. If `id` is given and is a valid team id, then the server will send the actual page.
 
 POST: This path tells the server to attempt to update a team entry. The following parameteres are required: `id`, `name`, and `oldId`. `oldId` is the id of the team you want to change, `id` is the new team id, and `name` is the new team name. If the `id` parameter matches an already existing team entry that is not the team entry you are trying to change, then the server will respond with status code 409 (Conflict) along with a JSON data packet containing error information. 
 
-### Change Score (`teams/changescore`) (GET|POST)
-// TODO add more documentation for this page
+### Change Score (`teams/changescore`) (GET|POST) (AUTH REQUIRED)
+//TODO add documentation for this
 
-## Login (`/login`)
+## Login (`/login`) (GET|POST)
 This page allows you to login to the site. You can also be redirected to this site by other pages that are protected.
 
 The page can take one query argument, `to`, that defines where the user should be sent after login is completed. The value of this argument should be URI encoded. If the parameter is not defined, the default is `/`.
 
 This page will also automatically redirect to the `to` query parameter if it is loaded and the user is logged in. This means that if you have a number of windows that have been logged out, you can log into one of them, then simply refresh the rest.
 
-## Logoff (`/logoff`)
+## Logoff (`/logoff`) (GET)
 Navigating to this page will log the user out and redirect them to the home page. There is currently no specification for where the user should be sent once logged out, since the only unprotected page is the homepage.
 
 In addition, navigating to this page while logged in will immediatly send the `login` event to all pages logged in as that user, reloading them and causing them to log out as well. Therefore, logging out of one page will log the user out of every page at once. This is a security measure meant to make sure that stray connections do not stay logged in.
 
-## Users (`/users`)
+## Users (`/users`) (GET) (AUTH REQUIRED)
 This page is built for managing users. On the left side of the screen is a list of all the users accounts. If the user is logged in as the master user, then they will also see the master user listed. Otherwise, the master user does not show up on this list. On the right side of the screen is information about the user, as well as tool buttons that can be used to manage the user account. If the user is signed in as the master, they will also see tools for managing other user accounts.
 
-### New User (`/users/newuser`)
+### New User (`/users/newuser`) (GET|POST) (AUTH REQUIRED)
 This page contains a form that allows you to add a new user. You must be an authenticated user to access this page via GET or POST. You can access this page by clicking the "Add New User" button under the user list in the Users page.
 
-### Delete User (`/users/deleteuser`) (POST)
+### Delete User (`/users/deleteuser`) (POST) (AUTH REQUIRED)
 This path instructs the server to delete a user account. The following parameters are required: `username`. In addition, this path requires authorization. Attempting to access the path without authorization will result in the server returning with a status of 401 (Unauthorized).
 
 When this path is called, the server checks to make sure that the `username` parameter is the same as the authorized user's username. This way, any user can delete their own account, but they cannot delete other user's accounts. The `Delete My Account` button on the Users page is by default supplied with the username of the currently authorized user. However, it is still possible to attempt to contact the server and delete another account using console commands.
@@ -205,11 +205,10 @@ If the user was successfully deleted, the server will respond with `{ ok: true }
 
 When `/users` recieves a success message from the server, it redirects the user to the login page.
 
-### Change Password (`/users/changepassword`) (GET)
-This page allows a user to change their password. The page has three inputs: a hidden input containing the username of the authenticated user and two password inputs, one for the password, and the other to confirm the password. This page cannot be accessed by unauthorized users. You can access this page by clicking the `Reset Password` button on the Users page.
+### Change Password (`/users/changepassword`) (GET|POST) (AUTH REQUIRED)
+GET: This page allows a user to change their password. The page has three inputs: a hidden input containing the username of the authenticated user and two password inputs, one for the password, and the other to confirm the password. This page cannot be accessed by unauthorized users. You can access this page by clicking the `Reset Password` button on the Users page.
 
-### Change Password (`/users/changepassword`) (POST)
-This path instructs the server to change a user password. It takes the following parameters: `username` and `password`.
+POST: This path instructs the server to change a user password. It takes the following parameters: `username` and `password`.
 
 The server will respond with a 401 (Unauthorized) status code if you attempt to access this path without proper authorization.
 
@@ -217,17 +216,17 @@ The server will respond with a 403 (Forbidden) status code if the `username` par
 
 If the action is successful, the server will respond with `{ok: true}`.
 
-### Log Out User (`/users/master/logoutuser`) (GET/POST)
+### Log Out User (`/users/master/logoutuser`) (GET) (MASTER AUTH REQUIRED)
 This page can only be accessed by the master user. Attempting to access the path without a valid authentication will result in a redirect to the login page on GET, and a 401 (Unauthorized) error on POST. Attempting to access the path with a valid authentication but as any user other than the master user will result in a 403 (Forbidden) error.
 
 The page can be used to invalidate any user's login token (making them sign in again), and to conduct a full log off (where all sessions automatically redirect to the login page).
 
-### Change User Password (`/users/master/logoutuser`) (GET)
+### Change User Password (`/users/master/changepassword`) (GET) (MASTER AUTH REQUIRED)
 This page can only be accessed by the master user. Attempting to access the path without a valid authentication will result in a redirect to the login page. Attempting to access the path with a valid authentication but as any user other than the master user will result in a 403 (Forbidden) error.
 
 This page can be used by the master user to change the password of any user account.
 
-### Delete User Account (`/users/master/deleteuser`) (GET)
+### Delete User Account (`/users/master/deleteuser`) (GET) (MASTER AUTH REQUIRED)
 This page can only be accessed by the master user. Attempting to access the path without a valid authentication will result in a redirect to the login page. Attempting to access the path with a valid authentication but as any user other than the master user will result in a 403 (Forbidden) error.
 
 This page can be used by the master user to delete any user account.
@@ -239,7 +238,7 @@ It's a secret. :)
 
 ## Get
 
-### Team Score (`/api/get/teamscore`)
+### Team Score (`/api/get/teamscore`) (POST)
 // TODO add documentation for this page
 
 # Design
