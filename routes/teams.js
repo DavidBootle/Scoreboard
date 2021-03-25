@@ -35,6 +35,10 @@ router.get('/', requireAuth, async function (req, res) {
         });
     }
     catch (e) {
+        res.status(500).render('error', {
+            error: e,
+            message: 'Database error'
+        })
         console.dir(e);
     }
     finally {
