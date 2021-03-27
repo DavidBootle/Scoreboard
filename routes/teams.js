@@ -55,9 +55,11 @@ router.get('/newteam', requireAuth, function (req, res) {
 
 router.post('/newteam', requireAuth, async function (req, res) {
 
+    console.dir(req.body)
+
     var name = req.body.name;
     var id = req.body.id;
-    var score = req.body.score;
+    var score = String(req.body.score);
 
     // verify all arguments exist
     if (name == undefined || id == undefined || score == undefined) {
@@ -97,11 +99,26 @@ router.post('/newteam', requireAuth, async function (req, res) {
             })
             return
         }
+        var randomNumber;
+        var unique = false;
+        while (!unique) {
+            // generate new number
+            randomNumber = ''
+            for (var i = 0; i < 6; i++) {
+                randomNumber += Math.floor(Math.random() * 10)
+            }
+            // check if unique
+            var matchingRand = await teams.findOne({password: randomNumber});
+            if (matchingRand == null) {
+                unique = true;
+            }
+        }
 
         const doc = {
             name: name,
             id: id,
-            score: score
+            score: score,
+            password: randomNumber
         };
         const result = await teams.insertOne(doc);
 
@@ -138,6 +155,16 @@ router.post('/newteam', requireAuth, async function (req, res) {
 router.post('/removeteam', requireAuth, async (req, res) => {
     var id = req.body.id;
 
+    if (id == undefined) {
+        res.status(400).send('One or more required parameters are missing.');
+        return;
+    }
+
+    if (id.length != 3 || !/^[0-9]*$/.test(id)) {
+        res.status(400).send('One or more required parameters did not meet validation requirements.');
+        return;
+    }
+
     var client = new MongoClient(req.app.get('databaseUrl'));
 
     try {
@@ -159,7 +186,7 @@ router.post('/removeteam', requireAuth, async (req, res) => {
         }
 
         if (result.deletedCount == 0) {
-            res.json({
+            res.status(500).json({
                 ok: false,
                 reason: 'Failed to delete',
                 errorCode: errorCode.FAILED_DELETE
@@ -169,12 +196,12 @@ router.post('/removeteam', requireAuth, async (req, res) => {
             var io = req.app.get('io');
             io.emit('scoreboard-update');
 
-            res.json({
+            res.status(200).json({
                 ok: true
             });
         }
     } catch (e) {
-        res.json({
+        res.status(500).json({
             ok: false,
             reason: 'Database error',
             errorCode: errorCode.DATABASE_ERROR

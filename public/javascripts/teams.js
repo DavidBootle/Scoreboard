@@ -32,6 +32,12 @@ async function newTeam() {
         })
     })
 
+    if (response.status == 400) {
+        var error = await response.text()
+        showAlert(error);
+        return;
+    }
+
     if (response.status == 401) {
         showAlert('Unauthorized. Please log in.')
         return
