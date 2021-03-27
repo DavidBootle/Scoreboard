@@ -47,7 +47,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      "connect-src": ["'self'", "wss://localhost"],
+      "connect-src": ["'self'", "wss:"],
       "script-src": ["'self'", (req, res) => `'nonce-${ res.locals.nonce }'`],
     }
   }
