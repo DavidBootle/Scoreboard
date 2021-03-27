@@ -31,7 +31,8 @@ router.get('/', requireAuth, async function (req, res) {
             title: 'Teams',
             teams: teams,
             user: req.user,
-            confirm: confirm
+            confirm: confirm,
+            nonce: res.locals.nonce
         });
     }
     catch (e) {
@@ -49,7 +50,8 @@ router.get('/', requireAuth, async function (req, res) {
 router.get('/newteam', requireAuth, function (req, res) {
     res.render('newteam', {
         title: 'New Team',
-        user: req.user
+        user: req.user,
+        nonce: res.locals.nonce
     });
 })
 
@@ -236,7 +238,8 @@ router.get('/editteam', requireAuth, async (req, res) => {
         res.render('editteam', {
             title: 'Edit Team',
             user: req.user,
-            team: team
+            team: team,
+            nonce: res.locals.nonce
         });
     }
     catch (e) {
@@ -340,7 +343,8 @@ router.get('/changescore', requireAuth, async (req, res) => {
             title: 'Change Score',
             user: req.user,
             teams: teams,
-            selectedTeamId: id.toString()
+            selectedTeamId: id.toString(),
+            nonce: res.locals.nonce
         })
     }
     catch (e) {

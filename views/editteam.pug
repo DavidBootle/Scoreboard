@@ -7,7 +7,7 @@ block content
     script(src='/javascripts/bootstrap.min.js')
 
 
-    script.
+    script(nonce=nonce).
         function validateName(input) {
             const nameFeedbackId = "#nameFeedback";
 
@@ -50,17 +50,27 @@ block content
             input(type='hidden', id='oldId', name='oldId', value=team.id)
             div(class='form-group mb-3')
                 label(for='name') Team Name
-                input(class='form-control', id='name', type='text', name='name', placeholder='Team Name', onkeyup='validateName(this)', value=team.name)
+                input(class='form-control', id='name', type='text', name='name', placeholder='Team Name', value=team.name)
                 div(class='invalid-feedback', id='nameFeedback')
             div(class='form-group mb-3')
                 label(for='id') Team ID
-                input(class='form-control', id='id', type='text', name='id', placeholder='420', onkeyup='validateID(this)', value=team.id)
+                input(class='form-control', id='id', type='text', name='id', placeholder='420', value=team.id)
                 div(class='invalid-feedback', id='idFeedback')
-        button(onclick='validateAndSubmit()', class='btn btn-primary') Update
+        button(id='updateButton', class='btn btn-primary') Update
         a(class='btn btn-outline-secondary ms-1', href='/teams') Cancel
     
     script(src="/socket.io/socket.io.js")
     script(src="/javascripts/socketutils.js")
-    script.
+    script(nonce=nonce).
+        $('#name').on('keyup', function () {
+            validateName(this);
+        })
+        $('#id').on('keyup', function () {
+            validateID(this);
+        })
+        $('#updateButton').on('click', function () {
+            validateAndSubmit();
+        })
+    script(nonce=nonce).
         var socket = io()
         addLogoffListener(socket);

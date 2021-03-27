@@ -5,7 +5,7 @@ block content
     script(src='/javascripts/formutils.js')
     script(src='/javascripts/bootstrap.min.js')
 
-    script.
+    script(nonce=nonce).
         async function login() {
 
             $('#alert-box').empty()
@@ -68,4 +68,9 @@ block content
                 label(for='password') Password
                 input(class='form-control', id='password', type='password', name='password')
                 div(class='invalid-feedback') Password is incorrect
-        button(onclick='login()', class='btn btn-primary') Login
+        button(id='loginButton', class='btn btn-primary') Login
+    
+    script(nonce=nonce).
+        $('#loginButton').on('click', function () {
+            login()
+        })

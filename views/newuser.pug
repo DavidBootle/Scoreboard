@@ -7,7 +7,7 @@ block content
     script(src='/javascripts/bootstrap.min.js')
 
 
-    script.
+    script(nonce=nonce).
         function validateUsername(input) {
             const usernameFeedbackId = "#usernameFeedback";
 
@@ -52,21 +52,34 @@ block content
         form(novalidate)
             div(class='form-group mb-3')
                 label(for='username') Username
-                input(class='form-control', id='username', type='text', name='username', placeholder='Username', onkeyup='validateUsername(this)')
+                input(class='form-control', id='username', type='text', name='username', placeholder='Username')
                 div(class='invalid-feedback', id='usernameFeedback')
             div(class='form-group mb-3')
                 label(for='password') Password
-                input(class='form-control', id='password', type='password', name='password', onkeyup='validatePassword(this, "#passwordConfirmation")')
+                input(class='form-control', id='password', type='password', name='password')
                 div(class='invalid-feedback', id='passwordFeedback')
             div(class='form-group mb-3')
                 label(for='password-confirmation') Confirm Password
-                input(class='form-control', id='passwordConfirmation', type='password', name='passwordConfirmation', onkeyup='validatePassword("#password", this)')
+                input(class='form-control', id='passwordConfirmation', type='password', name='passwordConfirmation')
                 div(class='invalid-feedback', id='passwordConfirmationFeedback') 
-        button(onclick='validateAndSubmit()', class='btn btn-primary') Create
+        button(id='createButton', class='btn btn-primary') Create
         a(class='btn btn-outline-secondary ms-1', href='/users') Cancel
     
     script(src="/socket.io/socket.io.js")
     script(src="/javascripts/socketutils.js")
-    script.
+    script(nonce=nonce).
+        $('#username').on('keyup', function () {
+            validateUsername(this);
+        })
+        $('#password').on('keyup', function() {
+            validatePassword(this, '#passwordConfirmation');
+        })
+        $('#passwordConfirmation').on('keyup', function() {
+            validatePassword('#password', this);
+        })
+        $('#createButton').on('click', function() {
+            validateAndSubmit();
+        })
+    script(nonce=nonce).
         var socket = io()
         addLogoffListener(socket);

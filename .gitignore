@@ -106,3 +106,5 @@ dist
 # cert keys
 cert.pem
 key.pem
+
+*.json

@@ -5,6 +5,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var sassMiddleware = require('node-sass-middleware');
+const helmet = require('helmet');
+var uuid = require('uuid').v4
 var MongoClient = require('mongodb').MongoClient;
 var crypto = require('crypto');
 var bcrypt = require('bcrypt');
@@ -36,6 +38,19 @@ app.use(sassMiddleware({
   dest: path.join(__dirname, 'public'),
   indentedSyntax: true, // true = .sass and false = .scss
   sourceMap: true
+}));
+app.use((req, res, next) => {
+  res.locals.nonce = uuid();
+  next();
+})
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      "connect-src": ["'self'", "wss://localhost"],
+      "script-src": ["'self'", (req, res) => `'nonce-${ res.locals.nonce }'`],
+    }
+  }
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(async function(req, res, next) {
@@ -80,7 +95,8 @@ app.get('/login', function(req, res) {
     res.render('login', {
       title: 'Login',
       forwardURL: decodeURIComponent(toURL),
-      user: req.user
+      user: req.user,
+      nonce: res.locals.nonce
     })
   }
 })
