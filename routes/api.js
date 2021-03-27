@@ -72,10 +72,9 @@ router.post('/get/teamscore', async (req, res) => {
 
 router.post('/get/authtoken', async (req, res) => {
 
-    var id = req.body.id;
     var password = req.body.password;
 
-    if (id == undefined || password == undefined) {
+    if (password == undefined) {
         res.status(400).send('One or more required parameters are missing.')
         return;
     }
@@ -87,22 +86,17 @@ router.post('/get/authtoken', async (req, res) => {
 
         var teams = client.db('scoreboard').collection('teams');
 
-        var team = await teams.findOne({id: id});
+        var team = await teams.findOne({password: password});
         
         if (team == null) {
-            res.status(404).send('No team exists with that id.');
-            return;
-        }
-
-        if (team.password != password) {
-            res.status(401).send('Invalid password for team with that id.');
+            res.status(401).send('Invalid.');
             return;
         }
 
         const generateAuthToken = req.app.get('generateAuthToken');
         const authToken = generateAuthToken()
 
-        var result = await teams.updateOne({id: id}, { $set : {'token': authToken}});
+        var result = await teams.updateOne({id: team.id}, { $set : {'token': authToken}});
 
         if (result.modifiedCount == 0) {
             res.status(500).send('Failed to update.');
