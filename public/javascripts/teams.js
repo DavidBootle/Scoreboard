@@ -7,7 +7,8 @@ async function newTeam() {
     // reset submission feedback
     $('#alert-box').empty()
 
-    if (name == '' || id == '' || score == '' || /^[A-Za-z0-9 \-_]+$/.test(id)) {
+    if (name == '' || id == '' || score == '' || !/^[A-Za-z0-9 \-_]+$/.test(id)) {
+        console.log('Did not pass pre-validation.')
         return
     }
 
