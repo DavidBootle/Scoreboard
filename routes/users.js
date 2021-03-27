@@ -37,7 +37,8 @@ router.get('/', requireAuth, async function (req, res) {
       res.render('users', {
           title: 'Users',
           users: users,
-          user: req.user
+          user: req.user,
+          nonce: res.locals.nonce
       });
   }
   catch (e) {
@@ -51,7 +52,8 @@ router.get('/', requireAuth, async function (req, res) {
 router.get('/newuser', requireAuth, async function (req, res) {
   res.render('newuser', {
     title: 'New User',
-    user: req.user
+    user: req.user,
+    nonce: res.locals.nonce
   })
 });
 
@@ -211,7 +213,8 @@ router.get('/changepassword', requireAuth, (req, res) => {
 
   res.render('changepassword', {
     title: 'Change Password',
-    user: req.user
+    user: req.user,
+    nonce: res.locals.nonce
   })
 });
 
@@ -301,7 +304,8 @@ router.get('/master/logoutuser', requireAuth, requireMasterAuth, async (req, res
     res.render('masterlogoutuser', {
       title: "Log Out A User",
       user: req.user,
-      users: users
+      users: users,
+      nonce: res.locals.nonce
     })
   }
   catch (e) {
@@ -342,6 +346,10 @@ router.post('/master/logoutuser', requireAuth, requireMasterAuth, async (req, re
           ok: true
         });
         return
+      } else {
+        res.json({
+          ok: true
+        })
       }
     } else {
       res.json({
@@ -376,7 +384,8 @@ router.get('/master/changepassword', requireAuth, requireMasterAuth, async (req,
     res.render('masterresetuserpassword', {
       title: "Reset A User's Password",
       user: req.user,
-      users: users
+      users: users,
+      nonce: res.locals.nonce
     })
   }
   catch (e) {
@@ -404,7 +413,8 @@ router.get('/master/deleteuser', requireAuth, requireMasterAuth, async (req, res
     res.render('masterdeleteuser', {
       title: "Delete User",
       user: req.user,
-      users: users
+      users: users,
+      nonce: res.locals.nonce
     })
   }
   catch (e) {

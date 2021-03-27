@@ -31,10 +31,15 @@ router.get('/', requireAuth, async function (req, res) {
             title: 'Teams',
             teams: teams,
             user: req.user,
-            confirm: confirm
+            confirm: confirm,
+            nonce: res.locals.nonce
         });
     }
     catch (e) {
+        res.status(500).render('error', {
+            error: e,
+            message: 'Database error'
+        })
         console.dir(e);
     }
     finally {
@@ -45,15 +50,29 @@ router.get('/', requireAuth, async function (req, res) {
 router.get('/newteam', requireAuth, function (req, res) {
     res.render('newteam', {
         title: 'New Team',
-        user: req.user
+        user: req.user,
+        nonce: res.locals.nonce
     });
 })
 
 router.post('/newteam', requireAuth, async function (req, res) {
 
+    console.dir(req.body)
+
     var name = req.body.name;
     var id = req.body.id;
-    var score = req.body.score;
+    var score = String(req.body.score);
+
+    // verify all arguments exist
+    if (name == undefined || id == undefined || score == undefined) {
+        res.status(400).send('One or more required parameters are missing.');
+        return;
+    }
+
+    // argument validation
+    if (name == '' || id == '' || score == '' || name.length > 40 || !/^[A-Za-z0-9 \-_]+$/.test(name) || id.length != 3 || !/^[0-9]*$/.test(id) || score.length > 30 || !/^\-?[0-9]+$/.test(score) || parseInt(score) == NaN) {
+        res.status(400).send('One or more required parameters did not meet validation requirements.')
+    }
 
     var client = new MongoClient(req.app.get('databaseUrl'));
 
@@ -75,23 +94,38 @@ router.post('/newteam', requireAuth, async function (req, res) {
         // check if team already exists (based on id parameter)
         var matchingTeam = await teams.findOne({id: id})
         if (matchingTeam != null) {
-            res.json({
+            res.status(409).json({
                 ok: false,
                 reason: `A team with the identifier ${id} already exists`,
                 errorCode: errorCode.TEAM_EXISTS
             })
             return
         }
+        var randomNumber;
+        var unique = false;
+        while (!unique) {
+            // generate new number
+            randomNumber = ''
+            for (var i = 0; i < 6; i++) {
+                randomNumber += Math.floor(Math.random() * 10)
+            }
+            // check if unique
+            var matchingRand = await teams.findOne({password: randomNumber});
+            if (matchingRand == null) {
+                unique = true;
+            }
+        }
 
         const doc = {
             name: name,
             id: id,
-            score: score
+            score: score,
+            password: randomNumber
         };
         const result = await teams.insertOne(doc);
 
         if (result.insertedCount == 0) {
-            res.json({
+            res.status(500).json({
                 ok: false,
                 reason: 'Failed to insert team into database',
                 errorCode: errorCode.FAILED_INSERT
@@ -102,13 +136,13 @@ router.post('/newteam', requireAuth, async function (req, res) {
             var io = req.app.get('io');
             io.emit('scoreboard-update');
 
-            res.json({
+            res.status(201).json({
                 ok: true
             });
         }
     }
     catch (e) {
-        res.json({
+        res.status(500).json({
             ok: false,
             reason: 'Database error',
             errorCode: errorCode.DATABASE_ERROR
@@ -122,6 +156,16 @@ router.post('/newteam', requireAuth, async function (req, res) {
 
 router.post('/removeteam', requireAuth, async (req, res) => {
     var id = req.body.id;
+
+    if (id == undefined) {
+        res.status(400).send('One or more required parameters are missing.');
+        return;
+    }
+
+    if (id.length != 3 || !/^[0-9]*$/.test(id)) {
+        res.status(400).send('One or more required parameters did not meet validation requirements.');
+        return;
+    }
 
     var client = new MongoClient(req.app.get('databaseUrl'));
 
@@ -144,7 +188,7 @@ router.post('/removeteam', requireAuth, async (req, res) => {
         }
 
         if (result.deletedCount == 0) {
-            res.json({
+            res.status(500).json({
                 ok: false,
                 reason: 'Failed to delete',
                 errorCode: errorCode.FAILED_DELETE
@@ -154,12 +198,12 @@ router.post('/removeteam', requireAuth, async (req, res) => {
             var io = req.app.get('io');
             io.emit('scoreboard-update');
 
-            res.json({
+            res.status(200).json({
                 ok: true
             });
         }
     } catch (e) {
-        res.json({
+        res.status(500).json({
             ok: false,
             reason: 'Database error',
             errorCode: errorCode.DATABASE_ERROR
@@ -194,7 +238,8 @@ router.get('/editteam', requireAuth, async (req, res) => {
         res.render('editteam', {
             title: 'Edit Team',
             user: req.user,
-            team: team
+            team: team,
+            nonce: res.locals.nonce
         });
     }
     catch (e) {
@@ -298,7 +343,8 @@ router.get('/changescore', requireAuth, async (req, res) => {
             title: 'Change Score',
             user: req.user,
             teams: teams,
-            selectedTeamId: id.toString()
+            selectedTeamId: id.toString(),
+            nonce: res.locals.nonce
         })
     }
     catch (e) {

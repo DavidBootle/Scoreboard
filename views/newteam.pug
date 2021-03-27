@@ -7,7 +7,7 @@ block content
     script(src='/javascripts/bootstrap.min.js')
 
 
-    script.
+    script(nonce=nonce).
         function validateName(input) {
             const nameFeedbackId = "#nameFeedback";
 
@@ -64,21 +64,34 @@ block content
         form(novalidate)
             div(class='form-group mb-3')
                 label(for='name') Team Name
-                input(class='form-control', id='name', type='text', name='name', placeholder='Team Name', onkeyup='validateName(this)')
+                input(class='form-control', id='name', type='text', name='name', placeholder='Team Name')
                 div(class='invalid-feedback', id='nameFeedback')
             div(class='form-group mb-3')
                 label(for='id') Team ID
-                input(class='form-control', id='id', type='text', name='id', placeholder='420', onkeyup='validateID(this)')
+                input(class='form-control', id='id', type='text', name='id', placeholder='420')
                 div(class='invalid-feedback', id='idFeedback')
             div(class='form-group mb-3')
                 label(for='score') Intitial Score
-                input(class='form-control', id='score', type='text', name='score', placeholder='0', onkeyup='validateScore(this)')
+                input(class='form-control', id='score', type='text', name='score', placeholder='0')
                 div(class='invalid-feedback', id='scoreFeedback') 
-        button(onclick='validateAndSubmit()', class='btn btn-primary') Create
+        button(id='createButton', class='btn btn-primary') Create
         a(class='btn btn-outline-secondary ms-1', href='/teams') Cancel
     
     script(src="/socket.io/socket.io.js")
     script(src="/javascripts/socketutils.js")
-    script.
+    script(nonce=nonce).
+        $('#name').on('keyup', function () {
+            validateName(this);
+        })
+        $('#id').on('keyup', function () {
+            validateID(this);
+        })
+        $('#score').on('keyup', function () {
+            validateScore(this);
+        })
+        $('#createButton').on('keyup', function () {
+            validateAndSubmit();
+        })
+    script(nonce=nonce).
         var socket = io()
         addLogoffListener(socket);

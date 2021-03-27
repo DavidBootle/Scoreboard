@@ -7,7 +7,7 @@ block content
     script(src='/javascripts/bootstrap.min.js')
 
 
-    script.
+    script(nonce=nonce).
 
         function validateScore(input) {
             const scoreFeedbackId = '#scoreFeedback';
@@ -75,7 +75,7 @@ block content
         form(novalidate)
             div(class='form-group mb-3')
                 label(for='team') Team
-                select(class='form-control', id='team', name='team' onchange='updateScore()')
+                select(class='form-control', id='team', name='team')
                     each selectTeam in teams
                         if selectTeam.id.toString() == selectedTeamId.toString()
                             option(value=selectTeam.id, selected)= `${selectTeam.name} (${selectTeam.id})`
@@ -83,16 +83,26 @@ block content
                             option(value=selectTeam.id)= `${selectTeam.name} (${selectTeam.id})`
             div(class='form-group mb-3')
                 label(for='score') Score
-                input(class='form-control', id='score', type='text', name='score', placeholder='0', onkeyup='validateScore(this)')
+                input(class='form-control', id='score', type='text', name='score', placeholder='0')
                 div(class='invalid-feedback', id='scoreFeedback') 
-        button(onclick='validateAndSubmit()', class='btn btn-primary', id='submit') Update Score
+        button(class='btn btn-primary', id='submit') Update Score
         a(class='btn btn-outline-secondary ms-1', href='/teams') Cancel
     
     script(src="/socket.io/socket.io.js")
     script(src="/javascripts/socketutils.js")
-    script.
+    script(nonce=nonce).
+        $('#team').on('change', function () {
+            updateScore();
+        })
+        $('#score').on('keyup', function () {
+            validateScore(this);
+        })
+        $('#submit').on('click', function () {
+            validateAndSubmit()
+        })
+    script(nonce=nonce).
         var socket = io()
         addLogoffListener(socket);
     
-    script.
+    script(nonce=nonce).
         updateScore();

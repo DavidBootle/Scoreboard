@@ -18,12 +18,15 @@ block content
                     each selectUser in users
                         option(value=selectUser.username)=selectUser.username
 
-        button(onclick='deleteUser($("#user").val(), false)', class='btn btn-danger') Delete
+        button(id='deleteButton', class='btn btn-danger') Delete
         a(class='btn btn-outline-secondary ms-1', href='/users') Cancel
     
     script(src="/socket.io/socket.io.js")
     script(src="/javascripts/socketutils.js")
-    script.
+    script(nonce=nonce).
+        $('#deleteButton').on('click', function () {
+            deleteUser($("#user").val(), false);
+        })
+    script(nonce=nonce).
         var socket = io()
         addLogoffListener(socket);
-        addUserListener(socket);

@@ -36,16 +36,21 @@ block content
                 hr
                 a(class='btn btn-primary user-tool-button', href='/logoff') Logout
                 a(class='btn btn-info user-tool-button' + (user.accountType == 'master' ? ' disabled' : ''), href='/users/changepassword') Reset Password
-                button(class='btn btn-danger user-tool-button', disabled=(user.accountType == 'master'), onclick='deleteUser("' + user.username + '")') Delete My Account
+                button(class='btn btn-danger user-tool-button', disabled=(user.accountType == 'master'), data-username=user.username, id='delete-button') Delete My Account
                 if user.accountType == 'master'
                     hr
-                    a(class='btn btn-primary user-tool-button' + (user.accountType != 'master' ? ' disabled' : ''), href='/users/master/logoffuser') Logout A User
+                    a(class='btn btn-primary user-tool-button' + (user.accountType != 'master' ? ' disabled' : ''), href='/users/master/logoutuser') Logout A User
                     a(class='btn btn-info user-tool-button' + (user.accountType != 'master' ? ' disabled' : ''), href='/users/master/changepassword') Reset A User's Password 
                     a(class='btn btn-danger user-tool-button' + (user.accountType != 'master' ? ' disabled' : ''), href='/users/master/deleteuser') Delete A User Account 
     
     script(src="/socket.io/socket.io.js")
     script(src="/javascripts/socketutils.js")
-    script.
+    script(nonce=nonce).
+        $('#delete-button').on('click', function() {
+            var username = $(this).data('username');
+            deleteUser(username);
+        })
+    script(nonce=nonce).
         var socket = io()
         addLogoffListener(socket);
         addUserListener(socket);

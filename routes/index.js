@@ -19,7 +19,8 @@ router.get('/', async function (req, res) {
     res.render('index', {
       title: 'Scoreboard',
       teams: teams,
-      user: req.user
+      user: req.user,
+      nonce: res.locals.nonce
     });
   }
   catch (e) {

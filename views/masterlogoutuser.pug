@@ -18,12 +18,16 @@ block content
                     each selectUser in users
                         option(value=selectUser.username)=selectUser.username
 
-        button(onclick='logoutUser()', class='btn btn-primary') Log Out
+        button(id='submitButton', class='btn btn-primary') Log Out
         a(class='btn btn-outline-secondary ms-1', href='/users') Cancel
     
     script(src="/socket.io/socket.io.js")
     script(src="/javascripts/socketutils.js")
-    script.
+    script(nonce=nonce).
+        $('#submitButton').on('click', function() {
+            logoutUser()
+        })
+    script(nonce=nonce).
         var socket = io()
         addLogoffListener(socket);
         addUserListener(socket);

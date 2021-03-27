@@ -35,7 +35,7 @@ block content
   
   script(src="/socket.io/socket.io.js")
   script(src="/javascripts/socketutils.js")
-  script.
+  script(nonce=nonce).
     var socket = io()
     addLogoffListener(socket);
     addScoreboardListener(socket);

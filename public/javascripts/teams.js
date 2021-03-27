@@ -7,7 +7,8 @@ async function newTeam() {
     // reset submission feedback
     $('#alert-box').empty()
 
-    if (name == '' || id == '' || score == '' || !/[0-9]{3}/.test(id)) {
+    if (name == '' || id == '' || score == '' || !/^[A-Za-z0-9 \-_]+$/.test(id)) {
+        console.log('Did not pass pre-validation.')
         return
     }
 
@@ -30,6 +31,12 @@ async function newTeam() {
             'score': score
         })
     })
+
+    if (response.status == 400) {
+        var error = await response.text()
+        showAlert(error);
+        return;
+    }
 
     if (response.status == 401) {
         showAlert('Unauthorized. Please log in.')
