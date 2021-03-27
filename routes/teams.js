@@ -59,9 +59,15 @@ router.post('/newteam', requireAuth, async function (req, res) {
     var id = req.body.id;
     var score = req.body.score;
 
+    // verify all arguments exist
     if (name == undefined || id == undefined || score == undefined) {
         res.status(400).send('One or more required parameters are missing.');
         return;
+    }
+
+    // argument validation
+    if (name == '' || id == '' || score == '' || name.length > 40 || !/^[A-Za-z0-9 \-_]+$/.test(name) || id.length != 3 || !/^[0-9]*$/.test(id) || score.length > 30 || !/^\-?[0-9]+$/.test(score) || parseInt(score) == NaN) {
+        res.status(400).send('One or more required parameters did not meet validation requirements.')
     }
 
     var client = new MongoClient(req.app.get('databaseUrl'));
@@ -84,7 +90,7 @@ router.post('/newteam', requireAuth, async function (req, res) {
         // check if team already exists (based on id parameter)
         var matchingTeam = await teams.findOne({id: id})
         if (matchingTeam != null) {
-            res.json({
+            res.status(409).json({
                 ok: false,
                 reason: `A team with the identifier ${id} already exists`,
                 errorCode: errorCode.TEAM_EXISTS
@@ -100,7 +106,7 @@ router.post('/newteam', requireAuth, async function (req, res) {
         const result = await teams.insertOne(doc);
 
         if (result.insertedCount == 0) {
-            res.json({
+            res.status(500).json({
                 ok: false,
                 reason: 'Failed to insert team into database',
                 errorCode: errorCode.FAILED_INSERT
@@ -111,13 +117,13 @@ router.post('/newteam', requireAuth, async function (req, res) {
             var io = req.app.get('io');
             io.emit('scoreboard-update');
 
-            res.json({
+            res.status(201).json({
                 ok: true
             });
         }
     }
     catch (e) {
-        res.json({
+        res.status(500).json({
             ok: false,
             reason: 'Database error',
             errorCode: errorCode.DATABASE_ERROR
