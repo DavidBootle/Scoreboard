@@ -22,7 +22,7 @@ block content
                         td(class='col-1')= team.id
                         td(class='col-4')= team.name 
                         td(class='col-3')= team.score
-                        td(class='col-2')= team.password
+                        td(class='col-2'): code= team.password
                         td(class='col-1')
                             a(href='/teams/changescore?id=' + encodeURIComponent(team.id), class='scoreboard-button text-info', title="Change Score"): i(class='fas fa-coins')
                             a(href='/teams/editteam?id=' + encodeURIComponent(team.id), class='scoreboard-button text-warning', title="Edit Team Info"): i(class="fas fa-edit")
