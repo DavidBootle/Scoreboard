@@ -156,4 +156,16 @@ router.post('/set/teamscore', requireAuth, async (req, res) => {
     }
 })
 
+router.post('/get/name', requireAuth, async (req, res) => {
+    res.status(200).send(req.team.name);
+})
+
+router.post('/get/id', requireAuth, (req, res) => {
+    res.status(200).send(req.team.id);
+})
+
+router.post('/test', requireAuth, (req, res) => {
+    res.status(200).send('OK');
+})
+
 module.exports = router;
