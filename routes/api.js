@@ -164,6 +164,10 @@ router.post('/get/id', requireAuth, (req, res) => {
     res.status(200).send(req.team.id);
 })
 
+router.post('/get/score', requireAuth, (req, res) => {
+    res.status(200).send(req.team.score);
+})
+
 router.post('/test', requireAuth, (req, res) => {
     res.status(200).send('OK');
 })
