@@ -177,6 +177,10 @@ app.get('/logoff', (req, res) => {
   res.redirect('/');
 })
 
+app.get('/favicon.ico', (req, res) => {
+  res.redirect('/images/favicon.ico');
+})
+
 app.get('/secret', (req, res) => {
   res.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ'); // :)
 })
