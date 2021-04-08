@@ -235,7 +235,7 @@ router.get('/editteam', requireAuth, async (req, res) => {
             res.status(404).send("Team with identifier \"" + id + "\" doesn't exist.")
         }
 
-        res.render('editteam', {
+        res.status(200).render('editteam', {
             title: 'Edit Team',
             user: req.user,
             team: team,
@@ -243,7 +243,7 @@ router.get('/editteam', requireAuth, async (req, res) => {
         });
     }
     catch (e) {
-        res.render('error', {
+        res.status(500).render('error', {
             message: 'Database error',
             error: e
         })
@@ -268,16 +268,16 @@ router.post('/editteam', requireAuth, async (req, res) => {
         TEAM_CONFLICTS: 'TEAM_CONFLICTS'
     }
 
-    if (id == undefined) {
-        res.status(400).send('Must include id parameter');
+    if (id == undefined || name == undefined || oldId == undefined ) {
+        res.status(400).send('One or more required parameters are missing.')
     }
 
-    if (name == undefined) {
-        res.status(400).send('Must include name parameter');
-    }
+    name = String(name)
+    id = String(id)
+    oldId = String(oldId)
 
-    if (oldId == undefined) {
-        res.status(400).send('Must include oldId parameter');
+    if (name == '' || id == '' || oldId == '' || name.length > 40 || !/^[A-Za-z0-9 \-_]+$/.test(name) || id.length != 3 || !/^[0-9]*$/.test(id)) {
+        res.status(400).send('One or more parameters did not meet validation requirements.')
     }
 
     var client = new MongoClient(req.app.get('databaseUrl'));
@@ -300,13 +300,13 @@ router.post('/editteam', requireAuth, async (req, res) => {
         const result = await teams.updateOne({'id': oldId}, { $set: {'id': id, 'name': name} });
 
         if (result.matchedCount == 0) {
-            res.json({
+            res.status(500).json({
                 ok: false,
                 reason: 'No team was updated',
                 errorCode: errorCode.FAILED_UPDATE
             })
         } else {
-            res.json({
+            res.status(200).json({
                 ok: true
             })
 

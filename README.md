@@ -274,6 +274,19 @@ Possible responses:
 - 200: `ok`
 - 500: `Database error`
 
+## Set Team Name (`/api/set/teamname`) (POST)
+Post path to set a team's name. Requires authorization in the form of an auth token set as the `Authorization` header.
+
+Takes parameters:
+- `name`: the new team of the team
+
+Possible responses:
+- 400: `One or more required parameters are missing.`
+- 400: `One or more parameters failed validation.`
+- 500: `Failed to update`
+- 200: `ok`
+- 500: `Database error`
+
 ## Get Team Name (`/api/get/name`) (POST)
 A post path that return the name of the authenticated team. Requires authorization in the form of an auth token set as the `Authorization` header.
 
@@ -288,6 +301,25 @@ Returns the id of the team.
 A post path that gets the current score of the authenticated team. Reqiures authorization in the form of an auth token set as the `Authorization` header.
 
 Returns the current score of the team.
+
+## Get Team List (`/api/get/teams`) (POST)
+Post path that returns a json object with every team and it's `id`, `name`, and `score`. Does not require authorization.
+
+Teams format:
+```json
+[
+  {
+    "name": "Team 1",
+    "id": "000",
+    "score": "0"
+  },
+  {
+    "name": "Team 2",
+    "id": "001",
+    "score": "0"
+  }
+]
+```
 
 ## Test (`/api/test`) (POST)
 A post path that tests authorization. Reqiures authorization in the form of an auth token set as the `Authorization` header.
