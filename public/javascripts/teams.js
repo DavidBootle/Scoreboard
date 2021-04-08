@@ -92,7 +92,7 @@ async function removeTeam(id, confirm) {
         })
     });
 
-    console.dir(resopnse);
+    console.dir(response);
 
     if (response.status == 401) {
         showAlert('Unauthorized. Please log in.');
