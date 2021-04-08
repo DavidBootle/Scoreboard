@@ -207,7 +207,7 @@ router.post('/get/id', requireAuth, (req, res) => {
 })
 
 router.post('/get/score', requireAuth, (req, res) => {
-    res.status(200).send(req.team.score);
+    res.status(200).send(req.team.score.toString());
 })
 
 router.post('/test', requireAuth, (req, res) => {
