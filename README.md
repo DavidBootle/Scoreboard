@@ -236,10 +236,65 @@ It's a secret. :)
 
 # API
 
-## Get
+## Team Score (`/api/get/teamscore`) (POST)
+Post path to get information about a team's score. Does not require authorization.
 
-### Team Score (`/api/get/teamscore`) (POST)
-// TODO add documentation for this page
+Takes parameters:
+- `id`: the id of the team to get the score for
+
+Possible responses:
+- 400: `Valid request must include id parameter.`
+- 404: `No team with that id.`
+- 200: Team score
+- 500: `Database error`
+
+## Auth Token (`/api/get/authtoken`) (POST)
+Post path to get an auth token using a team password. Note that using this will invalidate other auth tokens for the team.
+
+Takes parameters:
+- `password`: the team password of the team to get an auth token for
+
+Possible responses:
+- 400: `One or more required parameters are missing.`
+- 401: `Invalid.`
+- 500: `Failed to update.`
+- 200: Auth token
+- 500: `Database error`
+
+## Set Team Score (`/api/set/teamscore`) (POST)
+Post path to set a team's score. Requires authorization in the form of an auth token set as the `Authorization` header.
+
+Takes parameters:
+- `score`: the new score of the team
+
+Possible responses:
+- 400: `One or more required parameters are missing.`
+- 400: `One or more parameters failed validation.`
+- 500: `Failed to update`
+- 200: `ok`
+- 500: `Database error`
+
+## Get Team Name (`/api/get/name`) (POST)
+A post path that return the name of the authenticated team. Requires authorization in the form of an auth token set as the `Authorization` header.
+
+Returns the name of the team.
+
+## Get Team ID (`/api/get/id`) (POST)
+A post path that returns the id of the authenticated team. Requires authorization in the form of an auth token set as the `Authorization` header.
+
+Returns the id of the team.
+
+## Get Team Score (`/api/get/score`) (POST)
+A post path that gets the current score of the authenticated team. Reqiures authorization in the form of an auth token set as the `Authorization` header.
+
+Returns the current score of the team.
+
+## Test (`/api/test`) (POST)
+A post path that tests authorization. Reqiures authorization in the form of an auth token set as the `Authorization` header.
+
+Possible responses:
+- 401: `Invalid authorization header.`
+- 200: `OK`
 
 # Design
 This section covers the design of the app, including different design decisions, and how the app functions.
