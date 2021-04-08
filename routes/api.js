@@ -135,7 +135,7 @@ router.post('/set/teamscore', requireAuth, async (req, res) => {
 
         var teams = client.db('scoreboard').collection('teams');
 
-        var result = await teams.updateOne({'id': id}, { $set: {'score': score}});
+        var result = await teams.updateOne({'id': id}, { $set: {'score': parseInt(score)}});
 
         if (result.modifiedCount == 0) {
             res.status(500).send('Failed to update');

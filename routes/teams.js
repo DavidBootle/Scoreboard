@@ -119,7 +119,7 @@ router.post('/newteam', requireAuth, async function (req, res) {
         const doc = {
             name: name,
             id: id,
-            score: score,
+            score: parseInt(score),
             password: randomNumber
         };
         const result = await teams.insertOne(doc);
@@ -388,7 +388,7 @@ router.post('/changescore', requireAuth, async (req, res) => {
 
         var teams = client.db('scoreboard').collection('teams');
 
-        var result = await teams.updateOne({'id': id}, { $set: {'score': score}});
+        var result = await teams.updateOne({'id': id}, { $set: {'score': parseInt(score)}});
 
         if (result.modifiedCount == 0) {
             res.json({
