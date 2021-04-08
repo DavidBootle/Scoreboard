@@ -156,6 +156,48 @@ router.post('/set/teamscore', requireAuth, async (req, res) => {
     }
 })
 
+router.post('/set/teamname', requireAuth, async (req, res) => {
+    var name = req.body.name;
+    var id = req.team.id;
+
+    if (name == undefined) {
+        res.status(400).send('One or more required parameters are missing.');
+        return;
+    }
+
+    if (name == '' || name.length > 40 || !/^[A-Za-z0-9 \-_]+$/.test(name)) {
+        res.status(400).send('One or more parameters failed validation.');
+        return;
+    }
+
+    var client = new MongoClient(req.app.get('databaseUrl'));
+
+    try {
+        await client.connect();
+
+        var teams = client.db('scoreboard').collection('teams');
+
+        var result = await teams.updateOne({'id': id}, { $set: {'name': name}});
+
+        if (result.modifiedCount == 0) {
+            res.status(500).send('Failed to update');
+            return;
+        } else {
+            res.status(200).send('ok');
+
+            var io = req.app.get('io');
+            io.emit('scoreboard-update');
+        }
+    }
+    catch (e) {
+        res.status(500).send('Database error');
+        console.dir(e);
+    }
+    finally {
+        client.close()
+    }
+})
+
 router.post('/get/name', requireAuth, async (req, res) => {
     res.status(200).send(req.team.name);
 })
@@ -170,6 +212,31 @@ router.post('/get/score', requireAuth, (req, res) => {
 
 router.post('/test', requireAuth, (req, res) => {
     res.status(200).send('OK');
+})
+
+router.post('/get/teams', async (req, res) => {
+    // gets a list of all current team information
+
+    var client = new MongoClient(req.app.get('databaseUrl'));
+
+    try {
+        await client.connect()
+
+        var teamsCollection = client.db('scoreboard').collection('teams');
+
+        var projection = {'_id': 0, 'name': 1, 'id': 1, 'score': 1}
+
+        var teams = await teamsCollection.find({}).project(projection).toArray();
+
+        res.status(200).json(teams);
+    }
+    catch (e) {
+        res.status(500).send('Database error');
+        console.dir(e);
+    }
+    finally {
+        client.close();
+    }
 })
 
 module.exports = router;
