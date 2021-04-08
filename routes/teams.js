@@ -155,7 +155,7 @@ router.post('/newteam', requireAuth, async function (req, res) {
 })
 
 router.post('/removeteam', requireAuth, async (req, res) => {
-    var id = req.body.id;
+    var id = req.body.id.toString();
 
     if (id == undefined) {
         res.status(400).send('One or more required parameters are missing.');
