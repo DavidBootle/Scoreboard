@@ -16,11 +16,16 @@ router.get('/', async function (req, res) {
     var dbo = client.db('scoreboard');
     var teams = await dbo.collection('teams').find({}).sort({'score': -1, '_id': 1}).toArray();
 
+    var scoreboardTitle = process.env.SCOREBOARD_TITLE || 'Scoreboard';
+    var scoreLabel = process.env.SCORE_LABEL || 'Score';
+
     res.render('index', {
       title: 'Scoreboard',
       teams: teams,
       user: req.user,
-      nonce: res.locals.nonce
+      nonce: res.locals.nonce,
+      scoreboardTitle: scoreboardTitle,
+      scoreLabel: scoreLabel
     });
   }
   catch (e) {

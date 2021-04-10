@@ -120,6 +120,9 @@ The application reads this value on startup and retains it while the app is runn
 
 Please note that using a non-local database is **not recommended** for production. This feature is intended to be used when testing, in cases where you do not want to install MongoDB on your computer.
 
+## Custom Title and Score Labels
+Using the `.env` file can customize the title shown on the main scoreboard page, and the label of the `score` column on the scoreboard. To do this, add the `SCOREBOARD_TITLE` and `SCORE_LABEL` variables, respecitvely to the `.env` file.
+
 # Start
 Start the web server by running the following command:
 
