@@ -4,7 +4,7 @@ block content
 
   //- Title Area
   div(class='text-center')
-    h1 PreCDC Scoreboard 2021
+    h1=scoreboardTitle
     
     table(class='table mt-4')
       thead(class='thead-dark')
@@ -12,7 +12,7 @@ block content
           th(scope='col') #
           th(scope='col') Name
           th(scope='col') Team
-          th(scope='col') Rubees
+          th(scope='col')=scoreLabel
       tbody
         if teams.length != 0
           each team, index in teams 
@@ -29,9 +29,8 @@ block content
             td= '---'
     
     div(class='text-secondary mt-4')
-      p This server is under construction.
-      p: a(href='https://github.com/PSASchool/PreCDC-Scoreboard-Node') Github Repository
-      p: a(href='https://192.168.20.218:5000') Old Scoreboard
+      div(class='social-icon-bar'): a(href='https://github.com/PSASchool/PreCDC-Scoreboard-Node', style='color: black', title='See the project on Github'): i(class='fab fa-github')
+      div © 2021 David Bootle
   
   script(src="/socket.io/socket.io.js")
   script(src="/javascripts/socketutils.js")

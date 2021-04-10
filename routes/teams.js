@@ -27,12 +27,15 @@ router.get('/', requireAuth, async function (req, res) {
         var dbo = client.db('scoreboard');
         var teams = await dbo.collection('teams').find({}).sort({'id': 1, '_id': 1}).toArray();
 
+        var scoreLabel = process.env.SCORE_LABEL || 'Score';
+
         res.render('teams', {
             title: 'Teams',
             teams: teams,
             user: req.user,
             confirm: confirm,
-            nonce: res.locals.nonce
+            nonce: res.locals.nonce,
+            scoreLabel: scoreLabel
         });
     }
     catch (e) {
