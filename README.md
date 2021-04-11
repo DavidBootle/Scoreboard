@@ -54,8 +54,8 @@ sudo systemctl status mongod
 Run the following commands:
 
 ```bash
-$ git clone https://github.com/PSASchool/PreCDC-Scoreboard-Node
-$ cd PreCDC-Scoreboard-Node
+$ git clone https://github.com/TheWeirdSquid/Scoreboard
+$ cd Scoreboard
 ```
 
 ## Install Packages
