@@ -67,7 +67,7 @@ router.post('/newuser', requireAuth, async function (req, res) {
   var username = req.body.username;
   var unencryptedPassword = req.body.password;
 
-  if (!validation.exists([username, unencryptedPassword])) { return }
+  if (!validation.exists([username, unencryptedPassword], res)) { return }
 
   var password = await bcrypt.hash(unencryptedPassword, 10);
 
@@ -140,6 +140,8 @@ router.post('/deleteuser', requireAuth, async (req, res) => {
 
   var username = req.body.username;
 
+  if (!validation.exists([username], res)) { return }
+
   // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
   // ERROR CODE SET 005
   // Location for client: /javascripts/users.js
@@ -152,21 +154,7 @@ router.post('/deleteuser', requireAuth, async (req, res) => {
 
   // check to see if user is the same
   if (req.user.username != username && req.user.accountType != 'master') {
-    res.status(403).json({
-      ok: false,
-      reason: 'Cannot delete another user.',
-      errorCode: errorCode.INVALID_USER
-    });
-    return
-  }
-
-  // check to see if user being deleted is the master user
-  if (username == process.env.MASTER_USER) {
-    res.status(403).json({
-      ok: false,
-      reason: 'Cannot delete the master user.',
-      errorCode: errorCode.IS_MASTER_USER
-    });
+    res.status(403).send('Cannot delete another user.');
     return
   }
 
@@ -179,14 +167,20 @@ router.post('/deleteuser', requireAuth, async (req, res) => {
 
     var user = await users.findOne({'username': username});
 
+    if (user == null) {
+      res.status(404).send('User does not exist.');
+    }
+
+    // check to see if user being deleted is the master user
+    if (user.accountType == 'master') {
+      res.status(403).send('Cannot delete the master user.');
+      return
+    }
+
     var result = await users.deleteOne({'username': username});
 
     if (result.deletedCount == 0) {
-      res.json({
-        ok: false,
-        reason: 'Failed to delete',
-        errorCode: errorCode.FAILED_DELETE
-      });
+      res.status(500).send('Failed to delete.');
       return
     } else {
       // update clients
@@ -200,17 +194,11 @@ router.post('/deleteuser', requireAuth, async (req, res) => {
         }
       }
 
-      res.json({
-        ok: true
-      });
+      res.status(200).send(`User ${username} was removed.`);
     }
   }
   catch (e) {
-    res.json({
-      ok: false,
-      reason: 'Database error',
-      errorCode: errorCode.DATABASE_ERROR
-    });
+    res.status(500).send('Database error');
     console.dir(e);
   }
   finally {

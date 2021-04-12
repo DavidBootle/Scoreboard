@@ -74,29 +74,19 @@ async function deleteUser(username, redirect=true) {
     })
 
     if (response.status == 403) {
-        var error = await response.json();
-        showAlert('Forbidden: ' + error.reason);
+        var error = await response.text();
+        showAlert('Forbidden: ' + error);
         return
     }
 
-    const data = await response.json()
+    const data = await response.text()
 
-    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-    // ERROR CODE SET 005
-    // Location for server: /routes/users.js
-    const errorCode = {
-        DATABASE_ERROR: 'DATABASE_ERROR',
-        FAILED_DELETE: 'FAILED_DELETE',
-        INVALID_USER: 'INVALID_USER',
-        IS_MASTER_USER: 'IS_MASTER_USER'
-    }
-
-    if (data.ok == true && redirect) {
+    if (response.status == 200 && redirect) {
         window.location.assign('/login?to=' + encodeURIComponent('/users'))
-    } else if (data.ok) {
+    } else if (response.status == 200) {
         showAlert('User deleted. <a href="/users" class="alert-link">Click here</a> to go back to Users.', 'success');
     } else {
-        showAlert(data.reason);
+        showAlert(data);
         return
     }
 }
