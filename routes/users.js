@@ -29,23 +29,27 @@ router.get('/', requireAuth, async function (req, res) {
   var client = new MongoClient(req.app.get('databaseUrl'));
 
   try {
-      await client.connect();
+    await client.connect();
 
-      var dbo = client.db('scoreboard');
-      var users = await dbo.collection('users').find({}).sort({'username': 1}).toArray();
+    var dbo = client.db('scoreboard');
+    var users = await dbo.collection('users').find({}).sort({'username': 1}).toArray();
 
-      res.render('users', {
-          title: 'Users',
-          users: users,
-          user: req.user,
-          nonce: res.locals.nonce
-      });
+    res.render('users', {
+        title: 'Users',
+        users: users,
+        user: req.user,
+        nonce: res.locals.nonce
+    });
   }
   catch (e) {
-      console.dir(e);
+    console.dir(e);
+    res.status(500).render('error', {
+      error: e,
+      message: 'Database error'
+    })
   }
   finally {
-      client.close();
+    client.close();
   }
 })
 
