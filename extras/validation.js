@@ -16,7 +16,7 @@ validation.teamName = function (name, res, param_name = 'name') {
     let criteria = [
         name != '',
         name.length <= 40,
-        /^[A-Za-z0-9 \-_]+$/.test(name)
+        /^[A-Za-z0-9 \-_\(\):]+$/.test(name)
     ]
 
     for (c of criteria) {
