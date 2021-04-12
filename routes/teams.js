@@ -370,7 +370,15 @@ router.get('/changescore', requireAuth, async (req, res) => {
 router.post('/changescore', requireAuth, async (req, res) => {
 
     var id = req.body.id;
-    var score = req.body.score;
+    var score = req.body.score.toString();
+
+    if (id == undefined || score == undefined ) {
+        res.status(400).send('One or more required parameters are missing.')
+    }
+
+    if (score == '' || id.length != 3 || !/^[0-9]*$/.test(id) || score.length > 30 || !/^\-?[0-9]+$/.test(score) || parseInt(score) == NaN) {
+        res.status(400).send('One or more required parameters did not meet validation requirements.')
+    }
 
     // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
     // ERROR CODE SET 008
@@ -378,15 +386,6 @@ router.post('/changescore', requireAuth, async (req, res) => {
     const errorCode = {
         DATABASE_ERROR: 'DATABASE_ERROR',
         FAILED_UPDATE: 'FAILED_UPDATE'
-    }
-
-    if (id == undefined) {
-        res.status(400).send('"id" is a required parameter');
-        return;
-    }
-    if (score == undefined) {
-        res.status(400).send('"score" is a required parameter');
-        return;
     }
 
     var client = new MongoClient(req.app.get('databaseUrl'));
@@ -398,7 +397,7 @@ router.post('/changescore', requireAuth, async (req, res) => {
 
         var result = await teams.updateOne({'id': id}, { $set: {'score': parseInt(score)}});
 
-        if (result.modifiedCount == 0) {
+        if (result.matchedCount == 0) {
             res.json({
                 ok: false,
                 reason: "No team with that ID",
