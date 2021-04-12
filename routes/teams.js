@@ -1,6 +1,7 @@
 var express = require('express')
 var router = express.Router()
 var MongoClient = require('mongodb').MongoClient;
+var validation = require('../extras/validation');
 
 const requireAuth = (req, res, next) => {
     if (req.user) {
@@ -67,15 +68,12 @@ router.post('/newteam', requireAuth, async function (req, res) {
     var score = String(req.body.score);
 
     // verify all arguments exist
-    if (name == undefined || id == undefined || score == undefined) {
-        res.status(400).send('One or more required parameters are missing.');
-        return;
-    }
+    if (!validation.exists([name, id, score], res)) { return }
 
-    // argument validation
-    if (name == '' || id == '' || score == '' || name.length > 40 || !/^[A-Za-z0-9 \-_]+$/.test(name) || id.length != 3 || !/^[0-9]*$/.test(id) || score.length > 30 || !/^\-?[0-9]+$/.test(score) || parseInt(score) == NaN) {
-        res.status(400).send('One or more required parameters did not meet validation requirements.')
-    }
+    // validate arguments by criteria
+    if (!validation.teamName(name, res)) { return }
+    if (!validation.teamID(id, res)) { return }
+    if (!validation.teamScore(score, res)) { return }
 
     var client = new MongoClient(req.app.get('databaseUrl'));
 
