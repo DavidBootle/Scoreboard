@@ -222,7 +222,12 @@ router.get('/editteam', requireAuth, async (req, res) => {
     var id = req.query.id;
 
     if (id == undefined) {
-        res.status(400).send('Must include id parameter.');
+        res.status(400).send('One or more required parameters are missing.');
+    }
+
+    if (id.length != 3 || !/^[0-9]*$/.test(id)) {
+        res.status(400).send('One or more required parameters did not meet validation requirements.');
+        return;
     }
 
     var client = new MongoClient(req.app.get('databaseUrl'));
