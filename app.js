@@ -54,9 +54,30 @@ app.use(helmet({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(async function(req, res, next) {
-  const authToken = req.cookies["AuthToken"]
-  if (authToken == undefined || authToken == null) {
-    req.user = null;
+  if (req.cookies["AuthToken"] != null && req.cookies["AuthToken"] != undefined) {
+    var authToken = req.cookies["AuthToken"]
+  } else if (req.headers.authorization != null && req.headers.authorization != undefined) {
+    var fullAuthToken = req.headers.authorization;
+    let match = fullAuthToken.match(/^(?<type>\w*) (?<token>\S*)$/);
+
+    if (match == null || match == undefined) {
+      res.status(401).send('Invalid authorization header.');
+      return;
+    }
+
+    var type = match.groups.type;
+    var authToken = match.groups.token;
+
+    if (type != 'Bearer') {
+      res.status(401).send('Invalid authorization type.');
+      return;
+    }
+    if (authToken == null) {
+      res.status(401).send('No authorization token.');
+      return;
+    }
+  } else {
+    req.user == null;
     next();
     return;
   }
