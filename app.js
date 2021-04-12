@@ -68,7 +68,7 @@ app.use(async function(req, res, next) {
     var type = match.groups.type;
     var authToken = match.groups.token;
 
-    if (type != 'Bearer') {
+    if (type != 'Bearer' && req.path != '/token') {
       res.status(401).send('Invalid authorization type.');
       return;
     }
@@ -169,6 +169,82 @@ app.post('/login', async function(req, res) {
         reason: 'Incorrect password',
         errorCode: errorCode.INCORRECT_PASSWORD
       })
+      return
+    }
+  }
+  catch (e) {
+    console.dir(e)
+  }
+  finally {
+    await client.close()
+  }
+})
+
+app.post('/token', async function(req, res) {
+
+  if (req.user) { // user object is here, user is already authenticated so refuse to issue new token
+    res.status(406).send('Already authorized');
+    return;
+  }
+
+  // otherwise, get username and password from basic auth header
+  var authHeader = req.headers.authorization;
+  let match1 = authHeader.match(/^(?<type>\w*) (?<token>\S*)$/);
+
+  if (match1 == null || match1 == undefined) {
+    res.status(401).send('Invalid authorization header.');
+    return;
+  }
+
+  var type = match1.groups.type;
+  var authToken = match1.groups.token;
+
+  if (type != 'Basic') {
+    res.status(401).send('Invalid authorization type.');
+    return;
+  }
+  if (authToken == null) {
+    res.status(401).send('No authorization token.');
+    return;
+  }
+
+  let buff = Buffer.from(authToken, 'base64');
+  let decoded = buff.toString('ascii');
+
+  var match2 = decoded.match(/^(?<username>.*?):(?<password>.*)$/);
+
+  if (match2 == null) {
+    res.status(401).send('Invalid basic token syntax.');
+    return;
+  }
+
+  var username = match2.groups.username;
+  var password = match2.groups.password;
+  
+  var client = new MongoClient(app.get('databaseUrl'))
+
+  try {
+    await client.connect();
+
+    var users = client.db('scoreboard').collection('users');
+    var user = await users.findOne({'username': username});
+    if (user == null) {
+      res.status(401).send('No matching user.')
+      return
+    }
+    
+    var match = await bcrypt.compare(password, user.password)
+
+    if (match) {
+
+      const authToken = generateAuthToken()
+
+      await users.updateOne({'username': username}, {$set: {'token': authToken}})
+
+      res.status(200).send(authToken);
+
+    } else {
+      res.status(401).send('Incorrect password.')
       return
     }
   }
