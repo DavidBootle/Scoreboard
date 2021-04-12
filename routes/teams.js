@@ -158,15 +158,8 @@ router.post('/newteam', requireAuth, async function (req, res) {
 router.post('/removeteam', requireAuth, async (req, res) => {
     var id = req.body.id.toString();
 
-    if (id == undefined) {
-        res.status(400).send('One or more required parameters are missing.');
-        return;
-    }
-
-    if (id.length != 3 || !/^[0-9]*$/.test(id)) {
-        res.status(400).send('One or more required parameters did not meet validation requirements.');
-        return;
-    }
+    if (!validation.exists([id], res)) { return }
+    if (!validation.teamID(id, res)) { return }
 
     var client = new MongoClient(req.app.get('databaseUrl'));
 
@@ -268,18 +261,15 @@ router.post('/editteam', requireAuth, async (req, res) => {
         FAILED_UPDATE: 'FAILED_UPDATE',
         TEAM_CONFLICTS: 'TEAM_CONFLICTS'
     }
-
-    if (id == undefined || name == undefined || oldId == undefined ) {
-        res.status(400).send('One or more required parameters are missing.')
-    }
+    if (!validation.exists([id, name, oldId], res)) { return }
 
     name = String(name)
     id = String(id)
     oldId = String(oldId)
 
-    if (name == '' || id == '' || oldId == '' || name.length > 40 || !/^[A-Za-z0-9 \-_]+$/.test(name) || id.length != 3 || !/^[0-9]*$/.test(id)) {
-        res.status(400).send('One or more parameters did not meet validation requirements.')
-    }
+    if (!validation.teamName(name, res)) { return }
+    if (!validation.teamID(id, res)) { return }
+    if (!validation.teamID(oldId, res, 'oldId')) { return }
 
     var client = new MongoClient(req.app.get('databaseUrl'));
 
@@ -373,14 +363,9 @@ router.post('/changescore', requireAuth, async (req, res) => {
         FAILED_UPDATE: 'FAILED_UPDATE'
     }
 
-    if (id == undefined) {
-        res.status(400).send('"id" is a required parameter');
-        return;
-    }
-    if (score == undefined) {
-        res.status(400).send('"score" is a required parameter');
-        return;
-    }
+    if (!validation.exists([id, score], res)) { return }
+    if (!validation.teamID(id, res)) { return }
+    if (!validation.teamScore(score, res)) { return }
 
     var client = new MongoClient(req.app.get('databaseUrl'));
 
