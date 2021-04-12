@@ -12,7 +12,7 @@ validation.exists = function (paramsList, res) {
 }
 
 // takes a team name and validates it based on the validation criteria described in this function
-validation.teamName = function (name, res) {
+validation.teamName = function (name, res, param_name = 'name') {
     let criteria = [
         name != '',
         name.length <= 40,
@@ -20,8 +20,8 @@ validation.teamName = function (name, res) {
     ]
 
     for (c of criteria) {
-        if (c) {
-            res.status(400).send('One or more required parameters did not meet validation requirements.');
+        if (!c) {
+            res.status(400).send(`Parameter '${param_name}' failed to meet validation criteria.`);
             return false;
         }
     }
@@ -29,15 +29,15 @@ validation.teamName = function (name, res) {
     return true
 }
 
-validation.teamID = function (id, res) {
+validation.teamID = function (id, res, param_name = 'id') {
     let criteria = [
         id.length == 3,
         /^[0-9]*$/.test(id)
     ]
 
     for (c of criteria) {
-        if (c) {
-            res.status(400).send('One or more required parameters did not meet validation requirements.');
+        if (!c) {
+            res.status(400).send(`Parameter '${param_name}' failed to meet validation criteria.`);
             return false;
         }
     }
@@ -45,19 +45,19 @@ validation.teamID = function (id, res) {
     return true;
 }
 
-validation.teamScore = function (score, res) {
+validation.teamScore = function (score, res, param_name = 'score') {
     score = String(score)
 
     let criteria = [
         score != '',
         score.length <= 30,
         /^\-?[0-9]+$/.test(score),
-        parseInt(score) == NaN
+        parseInt(score) != NaN
     ]
 
     for (c of criteria) {
-        if (c) {
-            res.status(400).send('One or more required parameters did not meet validation requirements.');
+        if (!c) {
+            res.status(400).send(`Parameter '${param_name}' failed to meet validation criteria.`);
             return false;
         }
     }
