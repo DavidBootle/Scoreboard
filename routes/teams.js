@@ -127,7 +127,7 @@ router.post('/newteam', requireAuth, async function (req, res) {
         };
         const result = await teams.insertOne(doc);
 
-        if (result.insertedCount == 0) {
+        if (result.matchedCount == 0) {
             res.status(500).json({
                 ok: false,
                 reason: 'Failed to insert team into database',
