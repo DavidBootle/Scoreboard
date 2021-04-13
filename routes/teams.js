@@ -131,10 +131,12 @@ router.post('/newteam', requireAuth, async function (req, res) {
 })
 
 router.post('/removeteam', requireAuth, async (req, res) => {
-    var id = req.body.id.toString();
+    var id = req.body.id;
 
     if (!validation.exists([id], res)) { return }
     if (!validation.teamID(id, res)) { return }
+
+    id = id.toString();
 
     var client = new MongoClient(req.app.get('databaseUrl'));
 
