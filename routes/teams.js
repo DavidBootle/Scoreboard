@@ -61,8 +61,6 @@ router.get('/newteam', requireAuth, function (req, res) {
 
 router.post('/newteam', requireAuth, async function (req, res) {'t'
 
-    console.dir(req.body)
-
     var name = req.body.name;
     var id = req.body.id;
     var score = String(req.body.score);
