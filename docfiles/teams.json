@@ -1,0 +1,46 @@
+{
+    "title": "Teams",
+    "subsections": [
+        {
+            "path": {
+                "url": "/teams",
+                "method": "GET",
+                "requireAuth": true,
+                "requireMasterAuth": false
+            },
+            "parameters": {
+                "parameters": [
+                    {
+                        "name": "confirm",
+                        "value_type": "bool",
+                        "required": false,
+                        "default": "true",
+                        "description": "Whether to enable confirmation messages for deleting a team."
+                    }
+                ]
+            },
+            "logic": {
+                "steps": [
+                    "Loads parameters from url",
+                    "Connect to the database",
+                    "Get all teams from the database",
+                    "Render page template",
+                    "Send rendered html"
+                ]
+            },
+            "description": "This path contains a list of the teams displayed on the scoreboard, organized by their team ids. It also contains management tools used to manage the teams on the scoreboard.",
+            "responses": [
+                {
+                    "status": 200,
+                    "content": "Requested page",
+                    "context": "Normal operation"
+                },
+                {
+                    "status": 500,
+                    "content": "Error page",
+                    "context": "Database error"
+                }
+            ]
+        }
+    ]
+}
