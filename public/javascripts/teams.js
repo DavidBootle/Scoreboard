@@ -87,20 +87,12 @@ async function removeTeam(id, confirm) {
         return;
     }
 
-    const data = await response.json()
+    const data = await response.text()
 
-    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-    // ERROR CODE SET 003
-    // Location for server: /routes/teams.js
-    const errorCode = {
-        DATABASE_ERROR: 'database_error',
-        FAILED_DELETE: 'failed_delete'
-    }
-
-    if (data.ok == true) {
+    if (response.status == 200) {
         showAlert('Removed team.', 'success');
     } else {
-        showAlert(data.reason);
+        showAlert(data);
     }
 }
 

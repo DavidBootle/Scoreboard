@@ -59,7 +59,7 @@ router.get('/newteam', requireAuth, function (req, res) {
     });
 })
 
-router.post('/newteam', requireAuth, async function (req, res) {
+router.post('/newteam', requireAuth, async function (req, res) {'t'
 
     console.dir(req.body)
 
@@ -145,40 +145,25 @@ router.post('/removeteam', requireAuth, async (req, res) => {
 
         var teams = client.db('scoreboard').collection('teams');
 
-        const doc = {
-            id: id
-        };
-        const result = await teams.deleteOne(doc);
+        var match = await teams.findOne({id: id});
 
-        // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-        // ERROR CODE SET 003
-        // Location for client: /javascripts/teams.js
-        const errorCode = {
-            DATABASE_ERROR: 'database_error',
-            FAILED_DELETE: 'failed_delete'
+        if (match == null) {
+            res.status(404).send(`No team with id ${id}.`);
         }
 
+        const result = await teams.deleteOne({id: id});
+
         if (result.deletedCount == 0) {
-            res.status(500).json({
-                ok: false,
-                reason: 'Failed to delete',
-                errorCode: errorCode.FAILED_DELETE
-            });
+            res.status(500).send('Failed to delete');
         } else {
             // update clients
             var io = req.app.get('io');
             io.emit('scoreboard-update');
 
-            res.status(200).json({
-                ok: true
-            });
+            res.status(200).send('ok');
         }
     } catch (e) {
-        res.status(500).json({
-            ok: false,
-            reason: 'Database error',
-            errorCode: errorCode.DATABASE_ERROR
-        });
+        res.status(500).send('Database error');
         console.dir(e);
     } finally {
         client.close();
