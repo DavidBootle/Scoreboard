@@ -136,19 +136,18 @@ async function editTeam() {
             return;
     }
 
-    const data = await response.json();
+    const data = await response.text();
 
-    if (data.ok) {
+    if (response.status == 200) {
         showAlert('Team data changed. <a href="/teams" class="alert-link">Click here</a> to go back to Teams.', 'success');
         $('#oldId').val(id);
+    } else if (response.status == 304) {
+        showAlert('No data was changed. <a href="/teams" class="alert-link">Click here</a> to go back to Teams.', 'success')
+    } else if (response.status == 409) {
+        $('#id').addClass('is-invalid');
+        $('#idFeedback').text('Team with that ID already exists')
     } else {
-        if (data.errorCode == errorCode.TEAM_CONFLICTS) {
-            $('#id').addClass('is-invalid');
-            $('#idFeedback').text('Team with that ID already exists')
-        }
-        else {
-            showAlert(data.reason);
-        }
+        showAlert(data.reason);
     }
 
 }

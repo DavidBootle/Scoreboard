@@ -215,14 +215,6 @@ router.post('/editteam', requireAuth, async (req, res) => {
     var id = req.body.id;
     var oldId = req.body.oldId;
 
-    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-    // ERROR CODE SET 007
-    // Location for client: /javascripts/teams.js
-    const errorCode = {
-        DATABASE_ERROR: 'DATABASE_ERROR',
-        FAILED_UPDATE: 'FAILED_UPDATE',
-        TEAM_CONFLICTS: 'TEAM_CONFLICTS'
-    }
     if (!validation.exists([id, name, oldId], res)) { return }
 
     name = String(name)
@@ -243,25 +235,18 @@ router.post('/editteam', requireAuth, async (req, res) => {
         var matchingTeam = await teams.findOne({'id': id});
 
         if (matchingTeam != null && id != oldId) {
-            res.status(409).json({
-                ok: false,
-                reason: 'ID in use',
-                errorCode: errorCode.TEAM_CONFLICTS
-            }); return;
+            res.status(409).send('ID in use');
+            return;
         }
 
         const result = await teams.updateOne({'id': oldId}, { $set: {'id': id, 'name': name} });
 
         if (result.matchedCount == 0) {
-            res.status(500).json({
-                ok: false,
-                reason: 'No team was updated',
-                errorCode: errorCode.FAILED_UPDATE
-            })
+            res.status(500).send('Failed to update.');
+        } else if (result.modifiedCount == 0) {
+            res.status(304).send('Team information already matched request.')
         } else {
-            res.status(200).json({
-                ok: true
-            })
+            res.status(200).send('ok');
 
             // update clients
             var io = req.app.get('io');
@@ -269,11 +254,7 @@ router.post('/editteam', requireAuth, async (req, res) => {
         }
     }
     catch (e) {
-        res.status(500).json({
-            ok: false,
-            reason: 'Database error',
-            errorCode: errorCode.DATABASE_ERROR
-        })
+        res.status(500).send('Database error');
     }
     finally {
         client.close()
