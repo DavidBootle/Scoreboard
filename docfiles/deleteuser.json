@@ -1,0 +1,71 @@
+{
+    "title": "Delete User",
+    "subsections": [
+        {
+            "path": {
+                "url": "/users/deleteuser",
+                "method": "POST",
+                "requireAuth": true,
+                "requireMasterAuth": false
+            },
+            "parameters": {
+                "parameters": [
+                    {
+                        "name": "username",
+                        "value_type": "String",
+                        "required": true,
+                        "description": "The username of the user to delete."
+                    }
+                ]
+            },
+            "logic": {
+                "steps": [
+                    "Loads parameters from message body",
+                    "Validates parameters",
+                    "Connects to the database",
+                    "Create the user",
+                    "Send response",
+                    "Update clients"
+                ]
+            },
+            "description": "This path instructs the server to delete a user from the database. Any normal user will only be permitted to delete their own account. Attempting to delete another user's account will result in a 403 response. The master user can use this path to delete any user account. The master user account may not be deleted by any user, including the master user.",
+            "responses": [
+                {
+                    "status": 400,
+                    "content": "`One or more required parameters are missing.`",
+                    "context": "A required parameter was not sent as part of the message body."
+                },
+                {
+                    "status": 403,
+                    "content": "`Cannot delete another user.`",
+                    "context": "A normal user attempted to delete another user's account."
+                },
+                {
+                    "status": 404,
+                    "content": "`User does not exist.`",
+                    "context": "The targeted user did not exist."
+                },
+                {
+                    "status": 403,
+                    "content": "`Cannot delete the master user.`",
+                    "context": "The targeted user was the master user."
+                },
+                {
+                    "status": 500,
+                    "content": "`Failed to delete.`",
+                    "context": "The server attempted to delete the user but was unsuccessful."
+                },
+                {
+                    "status": 200,
+                    "content": "User {username} was removed.",
+                    "context": "The targeted user was removed."
+                },
+                {
+                    "status": 500,
+                    "content": "`Database error`",
+                    "context": "A fatal error occurred when attempting to delete the user."
+                }
+            ]
+        }
+    ]
+}
