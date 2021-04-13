@@ -59,7 +59,7 @@ router.get('/newteam', requireAuth, function (req, res) {
     });
 })
 
-router.post('/newteam', requireAuth, async function (req, res) {'t'
+router.post('/newteam', requireAuth, async function (req, res) {
 
     var name = req.body.name;
     var id = req.body.id;
