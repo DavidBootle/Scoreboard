@@ -1,0 +1,95 @@
+{
+    "title": "New Team",
+    "subsections": [
+        {
+            "path": {
+                "url": "/teams/newteam",
+                "method": "GET",
+                "requireAuth": true,
+                "requireMasterAuth": false
+            },
+            "description": "This page contains a form that can be used to create a new team. When the form is submitted, the data is sent to `/teams/newteam` via POST.",
+            "responses": [
+                {
+                    "status": 200,
+                    "content": "Requested page",
+                    "context": "Normal operation"
+                }
+            ]
+        },
+        {
+            "path": {
+                "url": "/teams/newteam",
+                "method": "POST",
+                "requireAuth": true,
+                "requireMasterAuth": false
+            },
+            "parameters": {
+                "parameters": [
+                    {
+                        "name": "name",
+                        "value_type": "String",
+                        "required": true,
+                        "description": "The name of the new team."
+                    },
+                    {
+                        "name": "id",
+                        "value_type": "String",
+                        "required": true,
+                        "description": "The id of the new team."
+                    },
+                    {
+                        "name": "score",
+                        "value_type": "String",
+                        "required": true,
+                        "description": "The initial score of the new team."
+                    }
+                ]
+            },
+            "logic": {
+                "steps": [
+                    "Loads parameters from the request body",
+                    "Validates parameters",
+                    "Connects to the database",
+                    "Checks for conflicting teams (teams with the same `id` as the new team)",
+                    "If there are no conflicting teams, then attempts to add the new team to the database",
+                    "Checks to see if the new team was added",
+                    "If the team was added, sends 201 response"
+                ]
+            },
+            "description": "This path instructs the server to create a new team with the given parameters. If the instruction is successful, then the new team is added to the scoreboard and all client displays the scoreboard are instructed to refresh.",
+            "responses": [
+                {
+                    "status": 409,
+                    "content": "`A team with the identifier {id} already exists`",
+                    "context": "The new team conflicted with an already existing team."
+                },
+                {
+                    "status": 400,
+                    "content": "`One or more required parameters are missing.`",
+                    "context": "A required parameter was not sent as part of the message body."
+                },
+                {
+                    "status": 400,
+                    "content": "`Parameter '{name}' failed to meet validation criteria.`",
+                    "context": "One of the following validation criteria was not met:<br><ul><li><function CriteriaPreset.TEAM_ID at 0x10b030940></li><li><function CriteriaPreset.TEAM_NAME at 0x10b0308b0></li><li><function CriteriaPreset.TEAM_SCORE at 0x10b0309d0></li></ul>"
+                },
+                {
+                    "status": 500,
+                    "content": "`Failed to insert team into database`",
+                    "context": "The server attempted to create the team but was unsuccessful."
+                },
+                {
+                    "status": 500,
+                    "content": "`Database error`",
+                    "context": "A fatal error occurred when attempting to create the team."
+                },
+                {
+                    "status": 201,
+                    "content": "`ok`",
+                    "context": "The team was created."
+                }
+            ]
+        }
+    ]
+}

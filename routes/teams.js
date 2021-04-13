@@ -76,15 +76,6 @@ router.post('/newteam', requireAuth, async function (req, res) {
     if (!validation.teamScore(score, res)) { return }
 
     var client = new MongoClient(req.app.get('databaseUrl'));
-
-    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-    // ERROR CODE SET 001
-    // Location for client: /javascripts/teams.js
-    const errorCode = {
-        DATABASE_ERROR: 'database_error',
-        TEAM_EXISTS: 'team_exists',
-        FAILED_INSERT: 'failed_insert'
-    }
     
     try {
         await client.connect();
@@ -95,11 +86,7 @@ router.post('/newteam', requireAuth, async function (req, res) {
         // check if team already exists (based on id parameter)
         var matchingTeam = await teams.findOne({id: id})
         if (matchingTeam != null) {
-            res.status(409).json({
-                ok: false,
-                reason: `A team with the identifier ${id} already exists`,
-                errorCode: errorCode.TEAM_EXISTS
-            })
+            res.status(409).send(`A team with the identifier ${id} already exists`)
             return
         }
         var randomNumber;
@@ -126,28 +113,18 @@ router.post('/newteam', requireAuth, async function (req, res) {
         const result = await teams.insertOne(doc);
 
         if (result.insertedCount == 0) {
-            res.status(500).json({
-                ok: false,
-                reason: 'Failed to insert team into database',
-                errorCode: errorCode.FAILED_INSERT
-            });
+            res.status(500).send('Failed to insert team into database');
         } else {
 
             // update clients
             var io = req.app.get('io');
             io.emit('scoreboard-update');
 
-            res.status(201).json({
-                ok: true
-            });
+            res.status(201).send('ok');
         }
     }
     catch (e) {
-        res.status(500).json({
-            ok: false,
-            reason: 'Database error',
-            errorCode: errorCode.DATABASE_ERROR
-        })
+        res.status(500).send('Database error');
         console.dir(e)
     }
     finally {

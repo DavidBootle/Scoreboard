@@ -43,26 +43,14 @@ async function newTeam() {
         return
     }
 
-    const data = await response.json();
-
-    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-    // ERROR CODE SET 001
-    // Location for server: /routes/teams.js
-    const errorCode = {
-        DATABASE_ERROR: 'database_error',
-        TEAM_EXISTS: 'team_exists',
-        FAILED_INSERT: 'failed_insert'
-    }
-
-    if (data.ok == true) {
+    if (response.status == 201) {
         showAlert('New team successfully added. <a href="/teams" class="alert-link">Click here</a> to go back to Teams.', 'success');
-    } else {
-        if (data.errorCode == errorCode.TEAM_EXISTS) {
-            invalidate('#id')
-            $('#idFeedback').text('Team already exists.')
-        } else {
-            showAlert(data.reason);
-        }
+    } else if (response.status == 409) {
+        invalidate('#id')
+        $('#idFeedback').text('Team already exists.')
+    }
+    else {
+        showAlert(data.reason);
     }
 }
 
