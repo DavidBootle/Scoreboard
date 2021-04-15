@@ -93,28 +93,14 @@ router.post('/deleteuser', requireAuth, async (req, res) => {
 
   if (!validation.exists([username], res)) { return }
 
-  // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-  // ERROR CODE SET 005
-  // Location for client: /javascripts/users.js
-  const errorCode = {
-    DATABASE_ERROR: 'DATABASE_ERROR',
-    FAILED_DELETE: 'FAILED_DELETE',
-    INVALID_USER: 'INVALID_USER',
-    IS_MASTER_USER: 'IS_MASTER_USER'
-  }
-
   // check to see if user is the same
   if (req.user.username != username && req.user.accountType != 'master') {
     res.status(403).send('Cannot delete another user.');
     return
   }
 
-  var client = new MongoClient(req.app.get('databaseUrl'));
-
-  try {
-    await client.connect()
-
-    var users = client.db('scoreboard').collection('users');
+  databaseTools.run(req, res, async (client) => {
+    var users = databaseTools.users(client);
 
     var user = await users.findOne({'username': username});
 
@@ -147,15 +133,8 @@ router.post('/deleteuser', requireAuth, async (req, res) => {
 
       res.status(200).send(`User ${username} was removed.`);
     }
-  }
-  catch (e) {
-    res.status(500).send('Database error');
-    console.dir(e);
-  }
-  finally {
-    client.close()
-  }
-})
+  });
+});
 
 router.get('/changepassword', requireAuth, (req, res) => {
 
