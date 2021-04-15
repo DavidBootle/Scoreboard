@@ -188,7 +188,8 @@ router.get('/editteam', requireAuth, async (req, res) => {
         var team = await teams.findOne({'id': id});
 
         if (team == undefined || team == null) {
-            res.status(404).send("Team with identifier \"" + id + "\" doesn't exist.")
+            res.status(404).send("Team with identifier \"" + id + "\" doesn't exist.");
+            return;
         }
 
         res.status(200).render('editteam', {
@@ -244,7 +245,7 @@ router.post('/editteam', requireAuth, async (req, res) => {
         if (result.matchedCount == 0) {
             res.status(500).send('Failed to update.');
         } else if (result.modifiedCount == 0) {
-            res.status(304);
+            res.sendStatus(304);
         } else {
             res.status(200).send('ok');
 
