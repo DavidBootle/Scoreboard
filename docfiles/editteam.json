@@ -1,1 +1,136 @@
-{"title": "Edit Team", "subsections": [{"path": {"url": "/teams/editteam", "method": "GET", "requireAuth": true, "requireMasterAuth": false}, "parameters": {"parameters": [{"name": "id", "value_type": "String", "required": true, "description": "The id of the team to edit"}]}, "logic": {"steps": ["Loads parameters from url", "Validates parameters", "Connects to the database", "Verify the requested team exists", "Load the team's information", "Render page template", "Send rendered html"]}, "description": "This page contains a form that can be used to change information about a team. The page sends the data entered in the form to `/teams/editteam` via POST.", "responses": [{"status": 400, "content": "`Must include id parameter.`", "context": "The `id` parameter was not included in the url."}, {"status": 404, "content": "`Team with identifier \"{id}\" doesn't exist.`", "context": "The team does not exist."}, {"status": 200, "content": "Requested page", "context": "Normal operation"}, {"status": 500, "content": "Error page", "context": "Database error"}]}, {"path": {"url": "/teams/editteam", "method": "POST", "requireAuth": true, "requireMasterAuth": false}, "parameters": {"parameters": [{"name": "name", "value_type": "String", "required": true, "description": "The new name of the team"}, {"name": "id", "value_type": "String", "required": true, "description": "The new ID of the team"}, {"name": "oldId", "value_type": "String", "required": true, "description": "The old ID of the team."}]}, "logic": {"steps": ["Loads parameters from request body", "Validates parameters", "Connects to database", "Checks for conflicting teams", "Update team information", "Send response", "Update clients"]}, "description": "Instructs the server to update the name and ID of a given team. If the operation is successful, the server will instruct clients to reload the scoreboard.", "responses": [{"status": 400, "content": "`One or more required parameters are missing.`", "context": "A required parameter was not sent as part of the message body."}, {"status": 400, "content": "`Parameter '{name}' failed to meet validation criteria.`", "context": "One of the following validation criteria was not met:<br><ul><li>`id` must be exactly 3 characters</li><li>`id` must follow pattern `^[0-9]*$`</li><li>`name` must be at least 1 character</li><li>`name` must be at most 40 characters</li><li>`name` must follow pattern `^[A-Za-z0-9 \\-_\\(\\):]+$`</li><li>`oldId` must be exactly 3 characters</li><li>`oldId` must follow pattern `^[0-9]*$`</li></ul>"}, {"status": 409, "content": "`ID in use`", "context": "The new ID is already assigned to a different team."}, {"status": 500, "content": "`Failed to update.`", "context": "The server attempted to update the team information but was unsuccessful."}, {"status": 200, "content": "`ok`", "context": "The team information was updated."}, {"status": 500, "content": "`Database error`", "context": "A fatal error occurred when attempting to update team information."}, {"status": 304, "content": "N/A", "context": "The server updated the team's information, but nothing changed because the information in the request already matched the information in the database."}]}]}
+{
+    "title": "Edit Team",
+    "subsections": [
+        {
+            "path": {
+                "url": "/teams/editteam",
+                "method": "GET",
+                "requireAuth": true,
+                "requireMasterAuth": false
+            },
+            "parameters": {
+                "parameters": [
+                    {
+                        "name": "id",
+                        "value_type": "String",
+                        "required": true,
+                        "description": "The id of the team to edit"
+                    }
+                ]
+            },
+            "logic": {
+                "steps": [
+                    "Loads parameters from url",
+                    "Validates parameters",
+                    "Connects to the database",
+                    "Verify the requested team exists",
+                    "Load the team's information",
+                    "Render page template",
+                    "Send rendered html"
+                ]
+            },
+            "description": "This page contains a form that can be used to change information about a team. The page sends the data entered in the form to `/teams/editteam` via POST.",
+            "responses": [
+                {
+                    "status": 400,
+                    "content": "`Must include id parameter.`",
+                    "context": "The `id` parameter was not included in the url."
+                },
+                {
+                    "status": 404,
+                    "content": "`Team with identifier \"{id}\" doesn't exist.`",
+                    "context": "The team does not exist."
+                },
+                {
+                    "status": 200,
+                    "content": "Requested page",
+                    "context": "Normal operation"
+                },
+                {
+                    "status": 500,
+                    "content": "Error page",
+                    "context": "Database error"
+                }
+            ]
+        },
+        {
+            "path": {
+                "url": "/teams/editteam",
+                "method": "POST",
+                "requireAuth": true,
+                "requireMasterAuth": false
+            },
+            "parameters": {
+                "parameters": [
+                    {
+                        "name": "name",
+                        "value_type": "String",
+                        "required": true,
+                        "description": "The new name of the team"
+                    },
+                    {
+                        "name": "id",
+                        "value_type": "String",
+                        "required": true,
+                        "description": "The new ID of the team"
+                    },
+                    {
+                        "name": "oldId",
+                        "value_type": "String",
+                        "required": true,
+                        "description": "The old ID of the team."
+                    }
+                ]
+            },
+            "logic": {
+                "steps": [
+                    "Loads parameters from request body",
+                    "Validates parameters",
+                    "Connects to database",
+                    "Checks for conflicting teams",
+                    "Update team information",
+                    "Send response",
+                    "Update clients"
+                ]
+            },
+            "description": "Instructs the server to update the name and ID of a given team. If the operation is successful, the server will instruct clients to reload the scoreboard.",
+            "responses": [
+                {
+                    "status": 400,
+                    "content": "`One or more required parameters are missing.`",
+                    "context": "A required parameter was not sent as part of the message body."
+                },
+                {
+                    "status": 400,
+                    "content": "`Parameter '{name}' failed to meet validation criteria.`",
+                    "context": "One of the following validation criteria was not met:<br><ul><li>`id` must be exactly 3 characters</li><li>`id` must follow pattern `^[0-9]*$`</li><li>`name` must be at least 1 character</li><li>`name` must be at most 40 characters</li><li>`name` must follow pattern `^[A-Za-z0-9 \\-_\\(\\):]+$`</li><li>`oldId` must be exactly 3 characters</li><li>`oldId` must follow pattern `^[0-9]*$`</li></ul>"
+                },
+                {
+                    "status": 409,
+                    "content": "`ID in use`",
+                    "context": "The new ID is already assigned to a different team."
+                },
+                {
+                    "status": 500,
+                    "content": "`Failed to update.`",
+                    "context": "The server attempted to update the team information but was unsuccessful."
+                },
+                {
+                    "status": 200,
+                    "content": "`ok`",
+                    "context": "The team information was updated."
+                },
+                {
+                    "status": 500,
+                    "content": "`Database error`",
+                    "context": "A fatal error occurred when attempting to update team information."
+                },
+                {
+                    "status": 304,
+                    "content": "N/A",
+                    "context": "The server updated the team's information, but nothing changed because the information in the request already matched the information in the database."
+                }
+            ]
+        }
+    ]
+}
