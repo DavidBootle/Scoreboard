@@ -2,6 +2,7 @@ var express = require('express')
 var router = express.Router()
 var MongoClient = require('mongodb').MongoClient;
 var validation = require('../extras/validation');
+var databaseTools = require('../extras/database-tools');
 
 const requireAuth = (req, res, next) => {
     if (req.user) {
@@ -20,13 +21,9 @@ router.get('/', requireAuth, async function (req, res) {
 
     var confirm = req.query.confirm == 'false' ? false : true
 
-    var client = new MongoClient(req.app.get('databaseUrl'));
+    databaseTools.run(req, res, async (client) => {
 
-    try {
-        await client.connect();
-
-        var dbo = client.db('scoreboard');
-        var teams = await dbo.collection('teams').find({}).sort({'id': 1, '_id': 1}).toArray();
+        var teams = await databaseTools.teams(client).find({}).sort({'id': 1, '_id': 1}).toArray();
 
         var scoreLabel = process.env.SCORE_LABEL || 'Score';
 
@@ -38,17 +35,7 @@ router.get('/', requireAuth, async function (req, res) {
             nonce: res.locals.nonce,
             scoreLabel: scoreLabel
         });
-    }
-    catch (e) {
-        res.status(500).render('error', {
-            error: e,
-            message: 'Database error'
-        })
-        console.dir(e);
-    }
-    finally {
-        client.close();
-    }
+    });
 })
 
 router.get('/newteam', requireAuth, function (req, res) {
@@ -73,13 +60,8 @@ router.post('/newteam', requireAuth, async function (req, res) {
     if (!validation.teamID(id, res)) { return }
     if (!validation.teamScore(score, res)) { return }
 
-    var client = new MongoClient(req.app.get('databaseUrl'));
-    
-    try {
-        await client.connect();
-
-        var dbo = client.db('scoreboard');
-        var teams = dbo.collection('teams');
+    databaseTools.run(req, res, async (client) => {
+        var teams = databaseTools.teams(client);
 
         // check if team already exists (based on id parameter)
         var matchingTeam = await teams.findOne({id: id})
@@ -120,14 +102,7 @@ router.post('/newteam', requireAuth, async function (req, res) {
 
             res.status(201).send('ok');
         }
-    }
-    catch (e) {
-        res.status(500).send('Database error');
-        console.dir(e)
-    }
-    finally {
-        client.close()
-    }
+    });
 })
 
 router.post('/removeteam', requireAuth, async (req, res) => {
@@ -138,12 +113,8 @@ router.post('/removeteam', requireAuth, async (req, res) => {
 
     id = id.toString();
 
-    var client = new MongoClient(req.app.get('databaseUrl'));
-
-    try {
-        await client.connect();
-
-        var teams = client.db('scoreboard').collection('teams');
+    databaseTools.run(req, res, async (client) => {
+        var teams = databaseTools.teams(client);
 
         var match = await teams.findOne({id: id});
 
@@ -162,12 +133,7 @@ router.post('/removeteam', requireAuth, async (req, res) => {
 
             res.status(200).send('ok');
         }
-    } catch (e) {
-        res.status(500).send('Database error');
-        console.dir(e);
-    } finally {
-        client.close();
-    }
+    });
 })
 
 router.get('/editteam', requireAuth, async (req, res) => {
@@ -178,12 +144,8 @@ router.get('/editteam', requireAuth, async (req, res) => {
         res.status(400).send('Must include id parameter.');
     }
 
-    var client = new MongoClient(req.app.get('databaseUrl'));
-
-    try {
-        await client.connect();
-
-        var teams = client.db('scoreboard').collection('teams');
+    databaseTools.run(req, res, async (client) => {
+        var teams = databaseTools.teams(client);
 
         var team = await teams.findOne({'id': id});
 
@@ -198,16 +160,7 @@ router.get('/editteam', requireAuth, async (req, res) => {
             team: team,
             nonce: res.locals.nonce
         });
-    }
-    catch (e) {
-        res.status(500).render('error', {
-            message: 'Database error',
-            error: e
-        })
-    }
-    finally {
-        client.close()
-    }
+    });
 });
 
 router.post('/editteam', requireAuth, async (req, res) => {
@@ -226,13 +179,9 @@ router.post('/editteam', requireAuth, async (req, res) => {
     if (!validation.teamID(id, res)) { return }
     if (!validation.teamID(oldId, res, 'oldId')) { return }
 
-    var client = new MongoClient(req.app.get('databaseUrl'));
-
-    try {
-        await client.connect()
-
-        var teams = client.db('scoreboard').collection('teams');
-
+    databaseTools.run(req, res, async (client) => {
+        var teams = databaseTools.teams(client);
+    
         var matchingTeam = await teams.findOne({'id': id});
 
         if (matchingTeam != null && id != oldId) {
@@ -253,26 +202,15 @@ router.post('/editteam', requireAuth, async (req, res) => {
             var io = req.app.get('io');
             io.emit('scoreboard-update');
         }
-    }
-    catch (e) {
-        res.status(500).send('Database error');
-    }
-    finally {
-        client.close()
-    }
+    });
 });
 
 router.get('/changescore', requireAuth, async (req, res) => {
 
     var id = req.query.id || '';
 
-    var client = new MongoClient(req.app.get('databaseUrl'));
-
-    try {
-
-        await client.connect()
-
-        var teams = await client.db('scoreboard').collection('teams').find().sort({'id': 1}).toArray()
+    databaseTools.run(req, res, async (client) => {
+        var teams = databaseTools.teams(client).find().sort({'id': 1}).toArray();
 
         res.status(200).render('changescore', {
             title: 'Change Score',
@@ -280,18 +218,8 @@ router.get('/changescore', requireAuth, async (req, res) => {
             teams: teams,
             selectedTeamId: id.toString(),
             nonce: res.locals.nonce
-        })
-    }
-    catch (e) {
-        res.status(500).render('error', {
-            message: 'Failed to load',
-            error: e
         });
-        console.dir(e)
-    }
-    finally {
-        client.close()
-    }
+    });
 })
 
 router.post('/changescore', requireAuth, async (req, res) => {
@@ -303,12 +231,8 @@ router.post('/changescore', requireAuth, async (req, res) => {
     if (!validation.teamID(id, res)) { return }
     if (!validation.teamScore(score, res)) { return }
 
-    var client = new MongoClient(req.app.get('databaseUrl'));
-
-    try {
-        await client.connect();
-
-        var teams = client.db('scoreboard').collection('teams');
+    databaseTools.run(req, res, async (client) => {
+        var teams = databaseTools.teams(client);
 
         var result = await teams.updateOne({'id': id}, { $set: {'score': parseInt(score)}});
 
@@ -323,14 +247,7 @@ router.post('/changescore', requireAuth, async (req, res) => {
             var io = req.app.get('io');
             io.emit('scoreboard-update');
         }
-    }
-    catch (e) {
-        res.status(500).send('Database error');
-        console.dir(e);
-    }
-    finally {
-        client.close();
-    }
+    });
 })
 
 module.exports = router
