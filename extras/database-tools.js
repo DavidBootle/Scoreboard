@@ -31,4 +31,12 @@ databaseTools.run = async function (req, res, func) {
     }
 }
 
+databaseTools.teams = function (client) {
+    return client.db('scoreboard').collection('teams');
+}
+
+databaseTools.users = function (client) {
+    return client.db('scoreboard').collection('users');
+}
+
 module.exports = databaseTools;
