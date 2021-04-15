@@ -106,6 +106,7 @@ router.post('/deleteuser', requireAuth, async (req, res) => {
 
     if (user == null) {
       res.status(404).send('User does not exist.');
+      return;
     }
 
     // check to see if user being deleted is the master user
