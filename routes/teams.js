@@ -274,7 +274,7 @@ router.get('/changescore', requireAuth, async (req, res) => {
 
         var teams = await client.db('scoreboard').collection('teams').find().sort({'id': 1}).toArray()
 
-        res.render('changescore', {
+        res.status(200).render('changescore', {
             title: 'Change Score',
             user: req.user,
             teams: teams,
@@ -283,11 +283,11 @@ router.get('/changescore', requireAuth, async (req, res) => {
         })
     }
     catch (e) {
-        res.render('error', {
+        res.status(500).render('error', {
             message: 'Failed to load',
             error: e
         });
-        console.dir(e);
+        console.dir(e)
     }
     finally {
         client.close()
@@ -297,15 +297,7 @@ router.get('/changescore', requireAuth, async (req, res) => {
 router.post('/changescore', requireAuth, async (req, res) => {
 
     var id = req.body.id;
-    var score = req.body.score;
-
-    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-    // ERROR CODE SET 008
-    // Location for client: /javascripts/teams.js
-    const errorCode = {
-        DATABASE_ERROR: 'DATABASE_ERROR',
-        FAILED_UPDATE: 'FAILED_UPDATE'
-    }
+    var score = req.body.score;C
 
     if (!validation.exists([id, score], res)) { return }
     if (!validation.teamID(id, res)) { return }
@@ -320,16 +312,12 @@ router.post('/changescore', requireAuth, async (req, res) => {
 
         var result = await teams.updateOne({'id': id}, { $set: {'score': parseInt(score)}});
 
-        if (result.modifiedCount == 0) {
-            res.json({
-                ok: false,
-                reason: "No team with that ID",
-                errorCode: errorCode.FAILED_UPDATE
-            });
+        if (result.matchedCount == 0) {
+            res.status(404).send('No team with that ID');
+        } else if (result.modifiedCount == 0) {
+            res.sendStatus(304); // not modified
         } else {
-            res.json({
-                ok: true
-            })
+            res.status(200).send('ok');
 
             // update clients
             var io = req.app.get('io');
@@ -337,11 +325,7 @@ router.post('/changescore', requireAuth, async (req, res) => {
         }
     }
     catch (e) {
-        res.status(500).json({
-            ok: false,
-            reason: 'Database error',
-            errorCode: errorCode.DATABASE_ERROR
-        })
+        res.status(500).send('Database error');
         console.dir(e);
     }
     finally {

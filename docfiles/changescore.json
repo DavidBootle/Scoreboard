@@ -1,0 +1,106 @@
+{
+    "title": "Change Team Score",
+    "subsections": [
+        {
+            "path": {
+                "url": "/teams/changescore",
+                "method": "GET",
+                "requireAuth": true,
+                "requireMasterAuth": false
+            },
+            "parameters": {
+                "parameters": [
+                    {
+                        "name": "id",
+                        "value_type": "String",
+                        "required": false,
+                        "default": "The team with the lowest team ID",
+                        "description": "The ID of the team whose information to load."
+                    }
+                ]
+            },
+            "description": "This page contains a form that allows you to change the score of team. On the page, you can select a team from a list, then set their score. Submitting the form sends a POST request to `/teams/changescore`. By setting the optional query parameter `id`, you can specify what team information should be displayed when the page loads.",
+            "responses": [
+                {
+                    "status": 200,
+                    "content": "Requested page",
+                    "context": "Normal operation"
+                },
+                {
+                    "status": 500,
+                    "content": "Error page",
+                    "context": "Database error"
+                }
+            ]
+        },
+        {
+            "path": {
+                "url": "/teams/changescore",
+                "method": "POST",
+                "requireAuth": true,
+                "requireMasterAuth": false
+            },
+            "parameters": {
+                "parameters": [
+                    {
+                        "name": "id",
+                        "value_type": "String",
+                        "required": true,
+                        "description": "The id of the team whose score to update."
+                    },
+                    {
+                        "name": "score",
+                        "value_type": "String",
+                        "required": true,
+                        "description": "The new score of the team."
+                    }
+                ]
+            },
+            "logic": {
+                "steps": [
+                    "Loads parameters from request body",
+                    "Validates parameters",
+                    "Connect to database",
+                    "Attempts to update team information",
+                    "Verifies that the team existed",
+                    "Verifies that data was changed",
+                    "Sends response",
+                    "Updates clients"
+                ]
+            },
+            "description": "Instructs the server to change the score of a team. If the operation is completed successfully, the server instructs connected clients to reload.",
+            "responses": [
+                {
+                    "status": 400,
+                    "content": "`One or more required parameters are missing.`",
+                    "context": "A required parameter was not sent as part of the message body."
+                },
+                {
+                    "status": 400,
+                    "content": "`Parameter '{name}' failed to meet validation criteria.`",
+                    "context": "One of the following validation criteria was not met:<br><ul><li>`id` must be exactly 3 characters</li><li>`id` must follow pattern `^[0-9]*$`</li><li>`score` must be at least one character</li><li>`score` must be at most 30 characters</li><li>`score` must follow pattern `^\\-?[0-9]+$`</li><li>`score` must be an integer</li></ul>"
+                },
+                {
+                    "status": 404,
+                    "content": "`No team with that ID`",
+                    "context": "The team does not exist."
+                },
+                {
+                    "status": 304,
+                    "content": "N/A",
+                    "context": "The server updated the team's score, but no data was changed since the data in the request matched the data in the database."
+                },
+                {
+                    "status": 200,
+                    "content": "`ok`",
+                    "context": "The server updated the team's score."
+                },
+                {
+                    "status": 500,
+                    "content": "`Database error`",
+                    "context": "A fatal error occurred when attempting to update the team's score."
+                }
+            ]
+        }
+    ]
+}

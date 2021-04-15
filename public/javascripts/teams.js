@@ -101,15 +101,6 @@ async function editTeam() {
     var id = $('#id').val()
     var oldId = $('#oldId').val()
 
-    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-    // ERROR CODE SET 007
-    // Location for server: /routes/teams.js
-    const errorCode = {
-        DATABASE_ERROR: 'DATABASE_ERROR',
-        FAILED_UPDATE: 'FAILED_UPDATE',
-        TEAM_CONFLICTS: 'TEAM_CONFLICTS'
-    }
-
     // reset submission feedback
     $('#alert-box').empty()
 
@@ -168,11 +159,13 @@ async function changeScore() {
         })
     })
 
-    const data = await response.json();
+    const data = await response.text();
 
-    if (data.ok) {
+    if (response.status == 200) {
         showAlert('Score updated. <a href="/teams" class="alert-link">Click here</a> to go back to Teams.', 'success');
+    } else if (response.status == 304) {
+        showAlert('No data was changed. <a href="/teams" class="alert-link">Click here</a> to go back to Teams.', 'success')
     } else {
-        showAlert(data.reason);
+        showAlert(data);
     }
 }
