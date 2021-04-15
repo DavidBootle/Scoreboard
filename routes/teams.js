@@ -244,7 +244,7 @@ router.post('/editteam', requireAuth, async (req, res) => {
         if (result.matchedCount == 0) {
             res.status(500).send('Failed to update.');
         } else if (result.modifiedCount == 0) {
-            res.status(304).send('Team information already matched request.')
+            res.status(304);
         } else {
             res.status(200).send('ok');
 
