@@ -297,7 +297,7 @@ router.get('/changescore', requireAuth, async (req, res) => {
 router.post('/changescore', requireAuth, async (req, res) => {
 
     var id = req.body.id;
-    var score = req.body.score;C
+    var score = req.body.score;
 
     if (!validation.exists([id, score], res)) { return }
     if (!validation.teamID(id, res)) { return }
