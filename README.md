@@ -1,11 +1,11 @@
-# PreCDC-Scoreboard-Node
-A new, updated, more secure version of the PreCDC-Scoreboard project.
+# Scoreboard
+Originally created for my school's PreCDC game in 2021, this secure scoreboard is fully functional and licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International. If you would like to use the scoreboard for commercial use, please contact me.
 
-Made for PSA's CyberDefense team in 2021 by David Bootle.
+© 2021 David Bootle
 
-This project is meant to replace the [old PreCDC-Scoreboard project](https://github.com/PSASchool/PreCDC-Scoreboard). It will be compatible with the current branch version of [the slot machine project](https://github.com/PSASchool/Python-Slots), which is the point of this scoreboard. 
+# About
 
-This scoreboard runs on Express (Node.js). Documentation for this project will be updated as the project develops.
+This scoreboard is a fully functional, customizable, secure web server that runs on node.js. Documentation for this scoreboard is written for Ubuntu Server, but this should run on any server that can run node.js. Detailed technical documentation can be found in the wiki of this project.
 
 # Prerequisites
 The server requires the following services/packages:
@@ -54,8 +54,8 @@ sudo systemctl status mongod
 Run the following commands:
 
 ```bash
-$ git clone https://github.com/PSASchool/PreCDC-Scoreboard-Node
-$ cd PreCDC-Scoreboard-Node
+$ git clone https://github.com/TheWeirdSquid/Scoreboard
+$ cd Scoreboard
 ```
 
 ## Install Packages
