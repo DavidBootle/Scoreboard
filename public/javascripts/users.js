@@ -30,25 +30,16 @@ async function newUser() {
         return
     }
 
-    const data = await response.json();
+    const data = await response.text();
 
-    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-    // ERROR CODE SET 004
-    // Location for server: /routes/users.js
-    const errorCode = {
-        DATABASE_ERROR: 'database_error',
-        USER_EXISTS: 'user_exists',
-        FAILED_INSERT: 'failed_insert'
-    }
-
-    if (data.ok == true) {
+    if (response.status == 201) {
         showAlert('New user successfully added. <a href="/users" class="alert-link">Click here</a> to go back to Users.', 'success');
     } else {
-        if (data.errorCode == errorCode.USER_EXISTS) {
+        if (response.status == 409) {
             invalidate('#username')
             $('#usernameFeedback').text('A user with that name already exists')
         } else {
-            showAlert(data.reason);
+            showAlert(data);
         }
     }
     
@@ -74,29 +65,19 @@ async function deleteUser(username, redirect=true) {
     })
 
     if (response.status == 403) {
-        var error = await response.json();
-        showAlert('Forbidden: ' + error.reason);
+        var error = await response.text();
+        showAlert('Forbidden: ' + error);
         return
     }
 
-    const data = await response.json()
+    const data = await response.text()
 
-    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-    // ERROR CODE SET 005
-    // Location for server: /routes/users.js
-    const errorCode = {
-        DATABASE_ERROR: 'DATABASE_ERROR',
-        FAILED_DELETE: 'FAILED_DELETE',
-        INVALID_USER: 'INVALID_USER',
-        IS_MASTER_USER: 'IS_MASTER_USER'
-    }
-
-    if (data.ok == true && redirect) {
+    if (response.status == 200 && redirect) {
         window.location.assign('/login?to=' + encodeURIComponent('/users'))
-    } else if (data.ok) {
+    } else if (response.status == 200) {
         showAlert('User deleted. <a href="/users" class="alert-link">Click here</a> to go back to Users.', 'success');
     } else {
-        showAlert(data.reason);
+        showAlert(data);
         return
     }
 }
@@ -129,27 +110,17 @@ async function changePassword() {
     });
 
     if (response.status == 403) {
-        var error = await response.json();
-        showAlert('Forbidden: ' + error.reason);
+        var error = await response.text();
+        showAlert('Forbidden: ' + error);
         return
     }
 
-    const data = await response.json()
+    const data = await response.text()
 
-    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-    // ERROR CODE SET 006
-    // Location for server: /routes/users.js
-    const errorCode = {
-        DATABASE_ERROR: 'DATABASE_ERROR',
-        FAILED_CHANGE: 'FAILED_CHANGE',
-        INVALID_USER: 'INVALID_USER',
-        IS_MASTER_USER: 'IS_MASTER_USER'
-    }
-
-    if (data.ok == true) {
+    if (response.status == 200) {
         showAlert('Password changed. <a href="/users" class="alert-link">Click here</a> to go back to Users.', 'success');
     } else {
-        showAlert(data.reason);
+        showAlert(data);
         return
     }
 }

@@ -43,26 +43,14 @@ async function newTeam() {
         return
     }
 
-    const data = await response.json();
-
-    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-    // ERROR CODE SET 001
-    // Location for server: /routes/teams.js
-    const errorCode = {
-        DATABASE_ERROR: 'database_error',
-        TEAM_EXISTS: 'team_exists',
-        FAILED_INSERT: 'failed_insert'
-    }
-
-    if (data.ok == true) {
+    if (response.status == 201) {
         showAlert('New team successfully added. <a href="/teams" class="alert-link">Click here</a> to go back to Teams.', 'success');
-    } else {
-        if (data.errorCode == errorCode.TEAM_EXISTS) {
-            invalidate('#id')
-            $('#idFeedback').text('Team already exists.')
-        } else {
-            showAlert(data.reason);
-        }
+    } else if (response.status == 409) {
+        invalidate('#id')
+        $('#idFeedback').text('Team already exists.')
+    }
+    else {
+        showAlert(data.reason);
     }
 }
 
@@ -99,20 +87,12 @@ async function removeTeam(id, confirm) {
         return;
     }
 
-    const data = await response.json()
+    const data = await response.text()
 
-    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-    // ERROR CODE SET 003
-    // Location for server: /routes/teams.js
-    const errorCode = {
-        DATABASE_ERROR: 'database_error',
-        FAILED_DELETE: 'failed_delete'
-    }
-
-    if (data.ok == true) {
+    if (response.status == 200) {
         showAlert('Removed team.', 'success');
     } else {
-        showAlert(data.reason);
+        showAlert(data);
     }
 }
 
@@ -120,15 +100,6 @@ async function editTeam() {
     var name = $('#name').val()
     var id = $('#id').val()
     var oldId = $('#oldId').val()
-
-    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-    // ERROR CODE SET 007
-    // Location for server: /routes/teams.js
-    const errorCode = {
-        DATABASE_ERROR: 'DATABASE_ERROR',
-        FAILED_UPDATE: 'FAILED_UPDATE',
-        TEAM_CONFLICTS: 'TEAM_CONFLICTS'
-    }
 
     // reset submission feedback
     $('#alert-box').empty()
@@ -156,19 +127,18 @@ async function editTeam() {
             return;
     }
 
-    const data = await response.json();
+    const data = await response.text();
 
-    if (data.ok) {
+    if (response.status == 200) {
         showAlert('Team data changed. <a href="/teams" class="alert-link">Click here</a> to go back to Teams.', 'success');
         $('#oldId').val(id);
+    } else if (response.status == 304) {
+        showAlert('No data was changed. <a href="/teams" class="alert-link">Click here</a> to go back to Teams.', 'success')
+    } else if (response.status == 409) {
+        $('#id').addClass('is-invalid');
+        $('#idFeedback').text('Team with that ID already exists')
     } else {
-        if (data.errorCode == errorCode.TEAM_CONFLICTS) {
-            $('#id').addClass('is-invalid');
-            $('#idFeedback').text('Team with that ID already exists')
-        }
-        else {
-            showAlert(data.reason);
-        }
+        showAlert(data.reason);
     }
 
 }
@@ -189,11 +159,13 @@ async function changeScore() {
         })
     })
 
-    const data = await response.json();
+    const data = await response.text();
 
-    if (data.ok) {
+    if (response.status == 200) {
         showAlert('Score updated. <a href="/teams" class="alert-link">Click here</a> to go back to Teams.', 'success');
+    } else if (response.status == 304) {
+        showAlert('No data was changed. <a href="/teams" class="alert-link">Click here</a> to go back to Teams.', 'success')
     } else {
-        showAlert(data.reason);
+        showAlert(data);
     }
 }

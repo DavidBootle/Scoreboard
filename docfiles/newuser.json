@@ -1,0 +1,86 @@
+{
+    "title": "New User",
+    "subsections": [
+        {
+            "path": {
+                "url": "/users/newteam",
+                "method": "GET",
+                "requireAuth": true,
+                "requireMasterAuth": false
+            },
+            "description": "This page contains a form for adding new user accounts. When the form is submitted, a POST request is sent to `/users/newuser`.",
+            "responses": [
+                {
+                    "status": 200,
+                    "content": "Requested page",
+                    "context": "Normal operation"
+                }
+            ]
+        },
+        {
+            "path": {
+                "url": "/users/newteam",
+                "method": "POST",
+                "requireAuth": true,
+                "requireMasterAuth": false
+            },
+            "parameters": {
+                "parameters": [
+                    {
+                        "name": "username",
+                        "value_type": "String",
+                        "required": true,
+                        "description": "The username of the new user."
+                    },
+                    {
+                        "name": "password",
+                        "value_type": "String",
+                        "required": true,
+                        "description": "The password of the new user."
+                    }
+                ]
+            },
+            "logic": {
+                "steps": [
+                    "Load parameters from request body",
+                    "Validate parameters",
+                    "Encrypt password",
+                    "Connect to database",
+                    "Check for conflicting users",
+                    "Insert new user into database",
+                    "Verify that user was created",
+                    "Send response",
+                    "Update clients"
+                ]
+            },
+            "description": "This path instructs the server to create a new user. The password parameter is stored in the database using one way encryption techniques for security. If the operation is successful, then all clients are instructed to reload the users list.",
+            "responses": [
+                {
+                    "status": 201,
+                    "content": "`ok`",
+                    "context": "The new user was created"
+                },
+                {
+                    "status": 400,
+                    "content": "`One or more required parameters are missing.`",
+                    "context": "A required parameter was not sent as part of the message body."
+                },
+                {
+                    "status": 409,
+                    "content": "`A user with the username {username} already exists`",
+                    "context": "The new user conflicted with an already existing user."
+                },
+                {
+                    "status": 500,
+                    "content": "`Failed to insert user into database`",
+                    "context": "The server attempted to create the user but was unsuccessful."
+                },
+                {
+                    "status": 500,
+                    "content": "`Database error`",
+                    "context": "A fatal error occurred when attempting to create the user."
+                }
+            ]
+        }
+    ]
+}

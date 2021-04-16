@@ -1,0 +1,34 @@
+{
+    "title": "Users",
+    "subsections": [
+        {
+            "path": {
+                "url": "/users",
+                "method": "GET",
+                "requireAuth": true,
+                "requireMasterAuth": false
+            },
+            "logic": {
+                "steps": [
+                    "Connect to database",
+                    "Get users from database",
+                    "Render page template",
+                    "Send rendered html"
+                ]
+            },
+            "description": "This page contains tools for managing user accounts. It has a list of the current users and tools for creating new users, logging out of the current user account, changing the password of the current user account, and deleting the current user account. In addition, if the current user account is the master user, tools are available for logging out any user, resetting any user password, and deleting any user account.",
+            "responses": [
+                {
+                    "status": 200,
+                    "content": "Requested page",
+                    "context": "Normal operation"
+                },
+                {
+                    "status": 500,
+                    "content": "Error page",
+                    "context": "Database error"
+                }
+            ]
+        }
+    ]
+}

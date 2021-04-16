@@ -1,0 +1,66 @@
+{
+    "title": "Remove Team",
+    "subsections": [
+        {
+            "path": {
+                "url": "/teams/removeteam",
+                "method": "POST",
+                "requireAuth": true,
+                "requireMasterAuth": false
+            },
+            "parameters": {
+                "parameters": [
+                    {
+                        "name": "id",
+                        "value_type": "String",
+                        "required": true,
+                        "description": "The id of the team to delete"
+                    }
+                ]
+            },
+            "logic": {
+                "steps": [
+                    "Load parameters from request body",
+                    "Validate parameters",
+                    "Connect to the database",
+                    "Delete the team",
+                    "Return status code 200",
+                    "Update clients"
+                ]
+            },
+            "description": "This path instructs the server to delete the specified team. If the operation is successful, then clients who listen for scoreboard updates will be instructed to refresh.",
+            "responses": [
+                {
+                    "status": 400,
+                    "content": "`One or more required parameters are missing.`",
+                    "context": "A required parameter was not sent as part of the message body."
+                },
+                {
+                    "status": 400,
+                    "content": "`Parameter '{name}' failed to meet validation criteria.`",
+                    "context": "One of the following validation criteria was not met:<br><ul><li>`id` must be exactly 3 characters</li><li>`id` must follow pattern `^[0-9]*$`</li></ul>"
+                },
+                {
+                    "status": 500,
+                    "content": "`Failed to delete`",
+                    "context": "The server attempted to delete the team but was unsuccessful."
+                },
+                {
+                    "status": 200,
+                    "content": "`ok`",
+                    "context": "The team was deleted."
+                },
+                {
+                    "status": 500,
+                    "content": "`Database error`",
+                    "context": "A fatal error occurred when attempting to delete the team."
+                },
+                {
+                    "status": 404,
+                    "content": "`No team with id {id}.`",
+                    "context": "No team existed with the specified id."
+                }
+            ]
+        }
+    ]
+}
