@@ -141,7 +141,12 @@ router.get('/editteam', requireAuth, async (req, res) => {
     var id = req.query.id;
 
     if (id == undefined) {
-        res.status(400).send('Must include id parameter.');
+        res.status(400).send('One or more required parameters are missing.');
+    }
+
+    if (id.length != 3 || !/^[0-9]*$/.test(id)) {
+        res.status(400).send('One or more required parameters did not meet validation requirements.');
+        return;
     }
 
     databaseTools.run(req, res, async (client) => {
@@ -225,7 +230,15 @@ router.get('/changescore', requireAuth, async (req, res) => {
 router.post('/changescore', requireAuth, async (req, res) => {
 
     var id = req.body.id;
-    var score = req.body.score;
+    var score = req.body.score.toString();
+
+    if (id == undefined || score == undefined ) {
+        res.status(400).send('One or more required parameters are missing.')
+    }
+
+    if (score == '' || id.length != 3 || !/^[0-9]*$/.test(id) || score.length > 30 || !/^\-?[0-9]+$/.test(score) || parseInt(score) == NaN) {
+        res.status(400).send('One or more required parameters did not meet validation requirements.')
+    }
 
     if (!validation.exists([id, score], res)) { return }
     if (!validation.teamID(id, res)) { return }
