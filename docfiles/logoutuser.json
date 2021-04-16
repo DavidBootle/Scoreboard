@@ -1,0 +1,85 @@
+{
+    "title": "Logout User",
+    "subsections": [
+        {
+            "path": {
+                "url": "/users/master/logoutuser",
+                "method": "GET",
+                "requireAuth": true,
+                "requireMasterAuth": true
+            },
+            "logic": {
+                "steps": [
+                    "Connects to database",
+                    "Gets user list from database",
+                    "Renders page tepmlate",
+                    "Sends rendered html"
+                ]
+            },
+            "description": "This page contains a user selector and a button. It is used to log out a user. This page is only available to the master user. Upon submission, a POST request is sent to `/users/master/logoutuser`.",
+            "responses": [
+                {
+                    "status": 200,
+                    "content": "Requested page",
+                    "context": "Normal operation"
+                },
+                {
+                    "status": 500,
+                    "content": "Error page",
+                    "context": "Database error"
+                }
+            ]
+        },
+        {
+            "path": {
+                "url": "/users/master/logoutuser",
+                "method": "POST",
+                "requireAuth": true,
+                "requireMasterAuth": true
+            },
+            "parameters": {
+                "parameters": [
+                    {
+                        "name": "username",
+                        "value_type": "String",
+                        "required": true,
+                        "description": "The username of the user to log out."
+                    }
+                ]
+            },
+            "logic": {
+                "steps": [
+                    "Loads parameters from request body",
+                    "Validates parameters",
+                    "Connects to database",
+                    "Unsets user's auth token",
+                    "Sends logout to user's clients",
+                    "Sends response"
+                ]
+            },
+            "description": "This path instructs the server to force log out a user. It can only be accessed by the master user.",
+            "responses": [
+                {
+                    "status": 500,
+                    "content": "`Database error`",
+                    "context": "A fatal error occurred when attempting to logging out the user."
+                },
+                {
+                    "status": 200,
+                    "content": "`ok`",
+                    "context": "The user was logged out"
+                },
+                {
+                    "status": 404,
+                    "content": "`User does not exist`",
+                    "context": "The user does not exist."
+                },
+                {
+                    "status": 400,
+                    "content": "`One or more required parameters are missing.`",
+                    "context": "A required parameter was not sent as part of the message body."
+                }
+            ]
+        }
+    ]
+}

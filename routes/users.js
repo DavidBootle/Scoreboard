@@ -183,47 +183,30 @@ router.post('/changepassword', requireAuth, async (req, res) => {
 
 router.get('/master/logoutuser', requireAuth, requireMasterAuth, async (req, res) => {
 
-  var client = new MongoClient(req.app.get('databaseUrl'));
-
-  try {
-    await client.connect()
-
-    var usersCollection = client.db('scoreboard').collection('users');
+  databaseTools.run(req, res, async (client) => {
+    var usersCollection = databaseTools.users(client);
 
     var users = await usersCollection.find({'accountType': { $ne: 'master'}}).sort({'username': 1}).toArray();
 
-    res.render('masterlogoutuser', {
+    res.status(200).render('masterlogoutuser', {
       title: "Log Out A User",
       user: req.user,
       users: users,
       nonce: res.locals.nonce
     })
-  }
-  catch (e) {
-    res.render('error', {
-      message: "Failed to load",
-      error: e
-    });
-    console.dir(e);
-  }
-  finally {
-    client.close();
-  }
+  });
 })
 
 router.post('/master/logoutuser', requireAuth, requireMasterAuth, async (req, res) => {
 
   var username = req.body.username;
 
-  var client = new MongoClient(req.app.get('databaseUrl'));
+  if (!validation.exists([username], res)) { return }
 
-  // log out all connected sockets for that user
-  try {
-    await client.connect()
-    
-    var users = client.db('scoreboard').collection('users')
-    
-    const result = await users.updateOne({'username': username}, {$unset: {'token': ''}})
+  databaseTools.run(req, res, async (client) => {
+    var users = databaseTools.users(client);
+
+    await users.updateOne({'username': username}, {$unset: {'token': ''}});
 
     var user = await users.findOne({'username': username});
 
@@ -233,42 +216,18 @@ router.post('/master/logoutuser', requireAuth, requireMasterAuth, async (req, re
           var io = req.app.get('io');
           io.to(socketId).emit('logoff');
         }
-        res.json({
-          ok: true
-        });
-        return
-      } else {
-        res.json({
-          ok: true
-        })
       }
+      res.status(200).send('ok');
     } else {
-      res.json({
-        ok: false,
-        reason: 'User does not exist'
-      })
-      return
+      res.status(404).send('User does not exist');
     }
-  }
-  catch (e) {
-    res.json({
-      ok: false,
-      reason: 'Database error'
-    })
-    console.dir(e);
-  }
-  finally {
-    client.close()
-  }
+  });
 });
 
 router.get('/master/changepassword', requireAuth, requireMasterAuth, async (req, res) => {
-  var client = new MongoClient(req.app.get('databaseUrl'));
 
-  try {
-    await client.connect()
-
-    var usersCollection = client.db('scoreboard').collection('users');
+  databaseTools.run(req, res, async (client) => {
+    var usersCollection = databaseTools.users();
 
     var users = await usersCollection.find({'accountType': { $ne: 'master'}}).sort({'username': 1}).toArray();
 
@@ -277,19 +236,9 @@ router.get('/master/changepassword', requireAuth, requireMasterAuth, async (req,
       user: req.user,
       users: users,
       nonce: res.locals.nonce
-    })
-  }
-  catch (e) {
-    res.render('error', {
-      message: "Failed to load",
-      error: e
     });
-    console.dir(e);
-  }
-  finally {
-    client.close();
-  }
-})
+  });
+});
 
 router.get('/master/deleteuser', requireAuth, requireMasterAuth, async (req, res) => {
   var client = new MongoClient(req.app.get('databaseUrl'));
