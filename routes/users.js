@@ -227,7 +227,7 @@ router.post('/master/logoutuser', requireAuth, requireMasterAuth, async (req, re
 router.get('/master/changepassword', requireAuth, requireMasterAuth, async (req, res) => {
 
   databaseTools.run(req, res, async (client) => {
-    var usersCollection = databaseTools.users();
+    var usersCollection = databaseTools.users(client);
 
     var users = await usersCollection.find({'accountType': { $ne: 'master'}}).sort({'username': 1}).toArray();
 
