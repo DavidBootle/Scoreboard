@@ -110,27 +110,17 @@ async function changePassword() {
     });
 
     if (response.status == 403) {
-        var error = await response.json();
-        showAlert('Forbidden: ' + error.reason);
+        var error = await response.text();
+        showAlert('Forbidden: ' + error);
         return
     }
 
-    const data = await response.json()
+    const data = await response.text()
 
-    // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-    // ERROR CODE SET 006
-    // Location for server: /routes/users.js
-    const errorCode = {
-        DATABASE_ERROR: 'DATABASE_ERROR',
-        FAILED_CHANGE: 'FAILED_CHANGE',
-        INVALID_USER: 'INVALID_USER',
-        IS_MASTER_USER: 'IS_MASTER_USER'
-    }
-
-    if (data.ok == true) {
+    if (response.status == 200) {
         showAlert('Password changed. <a href="/users" class="alert-link">Click here</a> to go back to Users.', 'success');
     } else {
-        showAlert(data.reason);
+        showAlert(data);
         return
     }
 }

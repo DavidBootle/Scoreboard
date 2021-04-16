@@ -151,71 +151,34 @@ router.post('/changepassword', requireAuth, async (req, res) => {
   var username = req.body.username;
   var password = req.body.password;
 
-  // BOTH THE CLIENT AND SERVER MUST SHARE THESE ERROR CODES FOR THIS FUNCTION
-  // ERROR CODE SET 006
-  // Location for client: /javascripts/users.js
-  const errorCode = {
-    DATABASE_ERROR: 'DATABASE_ERROR',
-    FAILED_CHANGE: 'FAILED_CHANGE',
-    INVALID_USER: 'INVALID_USER',
-    IS_MASTER_USER: 'IS_MASTER_USER'
-  }
+  if (!validation.exists([username, password], res)) { return }
 
   // check to see if user is the same or if master user is requesting password change
   if (req.user.username != username && req.user.accountType != 'master') {
-    res.status(403).json({
-      ok: false,
-      reason: 'Cannot change the password of another user.',
-      errorCode: errorCode.INVALID_USER
-    });
-    return
+    res.status(403).send('Cannot change the password of another user.');
+    return;
   }
 
-  // check to see if user being deleted is the master user
-  if (username == process.env.MASTER_USER) {
-    res.status(403).json({
-      ok: false,
-      reason: 'Cannot change the password of the master user.',
-      errorCode: errorCode.IS_MASTER_USER
-    });
-    return
-  }
+  databaseTools.run(req, res, async (client) => {
+    var users = databaseTools.users(client);
 
-  var client = new MongoClient(req.app.get('databaseUrl'));
-
-  try {
-    await client.connect()
-
-    var users = client.db('scoreboard').collection('users');
+    var matchedUser = await users.findOne({'username': username});
+    if (matchedUser != null) {
+      if (matchedUser.accountType == 'master') {
+        res.status(403).send('Cannot change the password of the master user.');
+        return
+      }
+    } else {
+      res.status(404).send('No user found.');
+      return;
+    }
 
     // change password
     var newPassword = await bcrypt.hash(password, 10);
-    var result = await users.updateOne({'username': username}, {$set: {'password': newPassword}})
+    var result = await users.updateOne({'username': username}, {$set: {'password': newPassword}});
 
-    if (result.modifiedCount == 0) {
-      res.json({
-        ok: false,
-        reason: 'Failed to change password',
-        errorCode: errorCode.FAILED_CHANGE
-      });
-      return
-    } else {
-      res.json({
-        ok: true
-      })
-    }
-  }
-  catch (e) {
-    res.json({
-      ok: false,
-      reason: 'Database error',
-      errorCode: errorCode.DATABASE_ERROR
-    });
-    console.dir(e)
-  }
-  finally {
-    client.close()
-  }
+    res.status(200).send('ok');
+  });
 });
 
 router.get('/master/logoutuser', requireAuth, requireMasterAuth, async (req, res) => {
