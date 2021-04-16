@@ -120,6 +120,7 @@ router.post('/removeteam', requireAuth, async (req, res) => {
 
         if (match == null) {
             res.status(404).send(`No team with id ${id}.`);
+            return;
         }
 
         const result = await teams.deleteOne({id: id});
@@ -142,6 +143,7 @@ router.get('/editteam', requireAuth, async (req, res) => {
 
     if (id == undefined) {
         res.status(400).send('Must include id parameter.');
+        return;
     }
 
     databaseTools.run(req, res, async (client) => {
@@ -208,6 +210,10 @@ router.post('/editteam', requireAuth, async (req, res) => {
 router.get('/changescore', requireAuth, async (req, res) => {
 
     var id = req.query.id || '';
+
+    if (typeof(id) != String) {
+        id = '';
+    }
 
     databaseTools.run(req, res, async (client) => {
         var teams = databaseTools.teams(client).find().sort({'id': 1}).toArray();
