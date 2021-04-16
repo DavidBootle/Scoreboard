@@ -241,12 +241,9 @@ router.get('/master/changepassword', requireAuth, requireMasterAuth, async (req,
 });
 
 router.get('/master/deleteuser', requireAuth, requireMasterAuth, async (req, res) => {
-  var client = new MongoClient(req.app.get('databaseUrl'));
 
-  try {
-    await client.connect()
-
-    var usersCollection = client.db('scoreboard').collection('users');
+  databaseTools.run(req, res, async (client) => {
+    var usersCollection = databaseTools.users(client);
 
     var users = await usersCollection.find({'accountType': { $ne: 'master'}}).sort({'username': 1}).toArray();
 
@@ -255,18 +252,8 @@ router.get('/master/deleteuser', requireAuth, requireMasterAuth, async (req, res
       user: req.user,
       users: users,
       nonce: res.locals.nonce
-    })
-  }
-  catch (e) {
-    res.render('error', {
-      message: "Failed to load",
-      error: e
     });
-    console.dir(e);
-  }
-  finally {
-    client.close();
-  }
-})
+  });
+});
 
 module.exports = router;
