@@ -1,3 +1,4 @@
+require('dotenv').config() // configure environment variables
 var createError = require('http-errors');
 var express = require('express');
 var session = require('express-session');
@@ -159,6 +160,8 @@ app.post('/login', async function(req, res) {
 
       res.cookie('AuthToken', authToken);
 
+      console.log(`New token generated for user ${username} via /login`);
+
       res.json({
         ok: true
       })
@@ -241,6 +244,7 @@ app.post('/token', async function(req, res) {
 
       await users.updateOne({'username': username}, {$set: {'token': authToken}})
 
+      console.log(`New token generated for user ${username} via /token`);
       res.status(200).send(authToken);
 
     } else {

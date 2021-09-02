@@ -3,8 +3,6 @@
 /**
  * Module dependencies.
  */
-
-require('dotenv').config() // configure environment variables
 var app = require('../app');
 var debug = require('debug')('precdc-scoreboard-node:server');
 var fs = require('fs')
@@ -16,8 +14,10 @@ var socketCookieParser = require('socket.io-cookie-parser');
 /**
  * Read certs
  */
-const key = fs.readFileSync('./key.pem')
-const cert = fs.readFileSync('./cert.pem')
+const keyLocation = process.env.KEY || './key.pem';
+const certLocation = process.env.CERT || './cert.pem';
+const key = fs.readFileSync(keyLocation);
+const cert = fs.readFileSync(certLocation);
 
 /**
  * Get port from environment and store in Express.
@@ -176,13 +176,15 @@ io.sockets.on('connection', async function(socket) {
 app.set('io', io)
 
 /**
- * Create HTTP server.
+ * Create HTTP server if custom port is not set.
  */
-var http = express()
-http.get('*', function (req, res) {
-  res.redirect('https://' + req.headers.host + req.url)
-})
-http.listen(80)
+if (!process.env.PORT) {
+  var http = express();
+  http.get('*', function (req, res) {
+    res.redirect('https://' + req.headers.host + req.url);
+  })
+  http.listen(80);
+}
 
 /**
  * Listen on provided port, on all network interfaces.
