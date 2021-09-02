@@ -64,6 +64,15 @@ Running the following command will automatically install all packages required f
 $ npm install
 ```
 
+## Create a `.env` File
+A number of configuration options are dependent on the `.env` file. This is a file that holds key-value pairs that customize the application's behavior.
+
+To create a `.env` file run the following command in the repository root:
+
+```bash
+$ echo "" > .env
+```
+
 ## Generate Keys
 Because the server operates on HTTPS in order to use a secure connection, the site must have a certificate. To create a self-signed certificate, use the following commands:
 
@@ -73,6 +82,13 @@ $ openssl rsa -in keytmp.pem -out key.pem
 $ rm keytmp.pem
 ```
 
+Alternatively, you can use your own generated key and cert files by specifying `KEY` and `CERT` in the `.env` file. For best results, use absolute paths.
+
+```
+KEY=/some/path/to/key.pem
+CERT=/some/path/to/cert.pem
+```
+
 ## Master User
 The server uses a login system to allow certain people to access the tools used to manage the scoreboard, and block others from doing the same thing. This system doesn't allow for sign ups, because that would defeat the purpose of only certain people being able to have a login. Therefore, the server operates on the assumtion that there is at least one administrator who can login and use the server tools to create more accounts for people that need them.
 
@@ -80,13 +96,7 @@ The issue is that when you first create the server, there aren't any users. The 
 
 The master user is **required** for the server to operate. The server will not start without the master user being set up.
 
-To set up the master user, you need to create a .env file for your app. You can do that by running the following command in the repository root:
-
-```bash
-$ echo "" > .env
-```
-
-Then, add the following lines to the .env file, replacing `username` and `password` with the actual username and password for the master account:
+Add the following lines to the .env file, replacing `username` and `password` with the actual username and password for the master account:
 
 ```
 MASTER_USER=username
@@ -121,7 +131,12 @@ The application reads this value on startup and retains it while the app is runn
 Please note that using a non-local database is **not recommended** for production. This feature is intended to be used when testing, in cases where you do not want to install MongoDB on your computer.
 
 ## Custom Title and Score Labels
-Using the `.env` file can customize the title shown on the main scoreboard page, and the label of the `score` column on the scoreboard. To do this, add the `SCOREBOARD_TITLE` and `SCORE_LABEL` variables, respecitvely to the `.env` file.
+Using the `.env` file can customize the title shown on the main scoreboard page, and the label of the `score` column on the scoreboard. To do this, add the `SCOREBOARD_TITLE` and `SCORE_LABEL` variables, respecitvely to the `.env` file. This is optional.
+
+```
+SCOREBOARD_TITLE=My Scoreboard
+SCORE_LABEL=Example Points
+```
 
 # Start
 Start the web server by running the following command:
