@@ -73,6 +73,14 @@ To create a `.env` file run the following command in the repository root:
 $ echo "" > .env
 ```
 
+## Port
+By default, the app runs an HTTPS server on port 443 and HTTP server on port 80 that redirects to the HTTPS server. This is so that you can run the server without the need for a proxy. However, you can set a custom port for use with a proxy by setting the `PORT` key in the .env file. This will change the port for the HTTPS server. Setting a custom port will disable the HTTP redirect server. If you wish to disable to the HTTP server while maintaining the HTTPS server on port 443, you can set the port to 443 in the .env.
+
+Example:
+```
+PORT=8080
+```
+
 ## Generate Keys
 Because the server operates on HTTPS in order to use a secure connection, the site must have a certificate. To create a self-signed certificate, use the following commands:
 
