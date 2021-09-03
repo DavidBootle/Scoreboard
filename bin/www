@@ -15,7 +15,7 @@ var socketCookieParser = require('socket.io-cookie-parser');
 /**
  * Read certs
  */
-if (process.env.PORT) {
+if (!process.env.PORT) {
   const keyLocation = process.env.KEY || './key.pem';
   const certLocation = process.env.CERT || './cert.pem';
   const key = fs.readFileSync(keyLocation);
