@@ -14,10 +14,12 @@ var socketCookieParser = require('socket.io-cookie-parser');
 /**
  * Read certs
  */
-const keyLocation = process.env.KEY || './key.pem';
-const certLocation = process.env.CERT || './cert.pem';
-const key = fs.readFileSync(keyLocation);
-const cert = fs.readFileSync(certLocation);
+if (process.env.PORT) {
+  const keyLocation = process.env.KEY || './key.pem';
+  const certLocation = process.env.CERT || './cert.pem';
+  const key = fs.readFileSync(keyLocation);
+  const cert = fs.readFileSync(certLocation);
+}
 
 /**
  * Get port from environment and store in Express.
@@ -83,10 +85,19 @@ async function setupDatabase() {
 setupDatabase().catch(console.dir);
 
 /**
- * Create HTTPS server.
+ * Create servers
  */
 
-var server = https.createServer({key: key, cert: cert}, app);
+if (process.env.PORT) {
+  var server = http.createServer(app);
+} else {
+  var server = https.createServer({key: key, cert: cert}, app);
+  var http = express();
+  http.get('*', function (req, res) {
+    res.redirect('https://' + req.headers.host + req.url);
+  })
+  http.listen(80);
+}
 
 /**
  * Create socket
@@ -174,17 +185,6 @@ io.sockets.on('connection', async function(socket) {
   })
 })
 app.set('io', io)
-
-/**
- * Create HTTP server if custom port is not set.
- */
-if (!process.env.PORT) {
-  var http = express();
-  http.get('*', function (req, res) {
-    res.redirect('https://' + req.headers.host + req.url);
-  })
-  http.listen(80);
-}
 
 /**
  * Listen on provided port, on all network interfaces.
